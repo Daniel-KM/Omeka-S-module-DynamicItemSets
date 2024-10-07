@@ -140,7 +140,7 @@ class ResourceOnSave
                         $vaResource[$vaTemplateProperty->property()->term()][] = $automaticValue;
                     }
                     // Order by linked resource property values.
-                    $resource = $this->orderByLinkedResourcePropertyData($vaRtpData, $vaResource);
+                    $vaResource = $this->orderByLinkedResourcePropertyData($vaRtpData, $vaResource);
                 }
             }
 
