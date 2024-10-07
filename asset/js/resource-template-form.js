@@ -107,7 +107,10 @@ propertyList.on('click', '.property-edit', function(e) {
         } else if (sidebarElementType === 'radio') {
             $('#edit-sidebar [data-setting-key="' + hiddenElement.data('setting-key') + '"]')
                 .val([prop.find('[data-setting-key="' + hiddenElement.data('setting-key') + '"]:checked').val()]);
-        } else if (sidebarElementType === 'select' || sidebarElementType === 'select-multiple' ) {
+        } else if (sidebarElementType === 'select'
+            || sidebarElementType === 'select-one'
+            || sidebarElementType === 'select-multiple'
+        ) {
             sidebarElement.val(hiddenElement.val());
             sidebarElement.trigger('chosen:updated');
         } else { // Text, textarea, number…
