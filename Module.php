@@ -961,7 +961,7 @@ class Module extends AbstractModule
             $translate = $helpers->get('translate');
             $hyperlink = $helpers->get('hyperlink');
             $escapeAttr = $helpers->get('escapeHtmlAttr');
-            $advancedSearchConfig = $helpers->has('searchConfigCurrent') ? $helpers->get('searchConfigCurrent') : null;
+            $advancedSearchConfig = $helpers->has('getSearchConfig') ? $helpers->get('getSearchConfig') : null;
             $siteSlug = $isSite ? $status->getRouteParam('site-slug') : null;
 
             $display = array_replace(array_fill_keys($allowed, false), array_fill_keys($display, true));
@@ -1128,18 +1128,21 @@ class Module extends AbstractModule
                     ]],
                 ];
             } else {
+                $prop = is_array($property) && !$advancedSearchConfig
+                    ? reset($property)
+                    : $property;
                 // For resource, the id may or may not be indexed in Solr, so
                 // use title. And the property may not be indexed too, anyway.
                 if ($vr) {
                     $urlQuery = ['filter' => [
                         [
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'res',
                             'value' => $vr->id(),
                         ],
                         [
                             'join' => 'or',
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'eq',
                             'value' => $vr->displayTitle(),
                         ],
@@ -1147,7 +1150,7 @@ class Module extends AbstractModule
                 } else {
                     $urlQuery = [
                         'filter' => [[
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'eq',
                             'value' => $uriOrVal,
                         ]],
@@ -1284,7 +1287,7 @@ class Module extends AbstractModule
             $escape = $helpers->get('escapeHtml');
             $translate = $helpers->get('translate');
             $escapeAttr = $helpers->get('escapeHtmlAttr');
-            $advancedSearchConfig = $helpers->has('searchConfigCurrent') ? $helpers->get('searchConfigCurrent') : null;
+            $advancedSearchConfig = $helpers->has('getSearchConfig') ? $helpers->get('getSearchConfig') : null;
             $siteSlug = $isSite ? $status->getRouteParam('site-slug') : null;
 
             $display = array_replace(array_fill_keys($allowed, false), array_fill_keys($display, true));
@@ -1410,18 +1413,22 @@ class Module extends AbstractModule
                     ]],
                 ];
             } else {
+                $prop = is_array($property) && !$advancedSearchConfig
+                    ? reset($property)
+                    : $property;
+
                 // For resource, the id may or may not be indexed in Solr, so
                 // use title. And the property may not be indexed too, anyway.
                 if ($vr) {
                     $urlQuery = ['filter' => [
                         [
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'res',
                             'value' => $vr->id(),
                         ],
                         [
                             'join' => 'or',
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'eq',
                             'value' => $vr->displayTitle(),
                         ],
@@ -1429,7 +1436,7 @@ class Module extends AbstractModule
                 } else {
                     $urlQuery = [
                         'filter' => [[
-                            'field' => $property,
+                            'field' => $prop,
                             'type' => 'eq',
                             'value' => $uriOrVal,
                         ]],
