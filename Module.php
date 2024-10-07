@@ -1030,8 +1030,11 @@ class Module extends AbstractModule
             return;
         }
 
+        // When the value is attached to a value annotation, there may be no
+        // resource.
+        // TODO Manage the settings for the value annotations (links, icons).
         $resource = $value->resource();
-        $controllerName = $resource->getControllerName();
+        $controllerName = $resource ? $resource->getControllerName() : null;
         if (!$controllerName) {
             $display = false;
             return;
