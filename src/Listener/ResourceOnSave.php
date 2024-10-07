@@ -34,7 +34,7 @@ class ResourceOnSave
     {
         $this->services = $services;
         $this->api = $this->services->get('Omeka\ApiManager');
-        $this->easyMeta = $this->services->get('EasyMeta');
+        $this->easyMeta = $this->services->get('Common\EasyMeta');
     }
 
     public function handleTemplateSettingsOnSave(Event $event): void

@@ -12,7 +12,7 @@ class ArtMapperFactory implements FactoryInterface
     {
         return new ArtMapper(
             $services->get('Omeka\ApiManager'),
-            $services->get('EasyMeta'),
+            $services->get('Common\EasyMeta'),
             $services->get('ControllerPluginManager')->get('translate')
         );
     }
