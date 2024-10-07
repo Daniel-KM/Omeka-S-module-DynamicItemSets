@@ -33,8 +33,8 @@ class ResourceOnSave
     public function __construct(ServiceLocatorInterface $services)
     {
         $this->services = $services;
-        $this->api = $this->services->get('Omeka\ApiManager');
-        $this->easyMeta = $this->services->get('Common\EasyMeta');
+        $this->api = $services->get('Omeka\ApiManager');
+        $this->easyMeta = $services->get('Common\EasyMeta');
     }
 
     public function handleTemplateSettingsOnSave(Event $event): void

@@ -3,7 +3,6 @@
 namespace AdvancedResourceTemplate\Form;
 
 use Common\Form\Element as CommonElement;
-use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 
 class SiteSettingsFieldset extends Fieldset
@@ -71,7 +70,7 @@ dcterms:issued
 # values-subject
 dcterms:subject
 
-# values-rights = Terms of use
+# values-rights = Terms of use
 dcterms:rights
 dcterms:license
 ',

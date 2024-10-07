@@ -859,6 +859,10 @@ class Module extends AbstractModule
      * Convert selected property values to links.
      *
      * @todo Factorize handleRepresentationValueHtml() and handleViewResourceShowValue().
+     *
+     * Adapted:
+     * @see \AdvancedResourceTemplate\Module::handleRepresentationValueHtml()
+     * @see \AdvancedSearch\View\Helper\SearchingValue::__invoke()
      */
     public function handleRepresentationValueHtml(Event $event): void
     {
@@ -1086,9 +1090,8 @@ class Module extends AbstractModule
                 );
             }
             if ($display['value_search']) {
-                $result['value_search'] = $vr
-                    ? $hyperlink->raw(strip_tags($html), $searchUrl, ['class' => 'metadata-search-link'])
-                    : $hyperlink->raw(strlen($val) ? strip_tags($val) : $uri, $searchUrl, ['class' => 'metadata-search-link']);
+                $searchLabel = $vr ? $html : (strlen($val) ? $val : $uri);
+                $result['value_search'] = $hyperlink(strip_tags($searchLabel), $searchUrl, ['class' => 'metadata-search-link']);
             }
             if ($display['icon_search']) {
                 $htmlIconSearch = sprintf('<a href="%1$s" class="metadata-search-link" ><span title="%2$s" class="o-icon-search"></span></a>', $escapeAttr($searchUrl), $text['search']);
@@ -1155,9 +1158,8 @@ class Module extends AbstractModule
                 ? $advancedSearchConfig->adminSearchUrl(false, $urlQuery)
                 : $advancedSearchConfig->siteUrl($siteSlug, false, $urlQuery);
             if ($display['value_advanced_search']) {
-                $result['value_advanced_search'] = $vr
-                    ? $hyperlink->raw(strip_tags($html), $searchUrl, ['class' => 'metadata-search-link'])
-                    : $hyperlink->raw(strlen($val) ? strip_tags($val) : $uri, $searchUrl, ['class' => 'metadata-search-link']);
+                $searchLabel = $vr ? $html : (strlen($val) ? $val : $uri);
+                $result['value_advanced_search'] = $hyperlink(strip_tags($searchLabel), $searchUrl, ['class' => 'metadata-search-link']);
             }
             if ($display['icon_advanced_search']) {
                 $htmlIconSearch = sprintf('<a href="%1$s" class="metadata-search-link" ><span title="%2$s" class="o-icon-search"></span></a>', $escapeAttr($searchUrl), $text['search']);
@@ -1459,7 +1461,7 @@ class Module extends AbstractModule
                 : '<a href="%1$s" class="uri-value-link" target="_blank" rel="noopener"><span title="%2$s" class="o-icon-external"></span></a>',
                 $escapeAttr($uri),
                 $text['uri']
-                );
+            );
             $result['record_append_icon_uri'] = $display['record_append_icon_uri'] ? $htmlIconUri : '';
         }
 
@@ -1898,7 +1900,7 @@ class Module extends AbstractModule
         $this->appendCssGroupMultiCheckbox();
     }
 
-    protected function appendCssGroupMultiCheckbox()
+    protected function appendCssGroupMultiCheckbox(): void
     {
         /** @var \Laminas\View\Helper\HeadStyle headStyle */
         $headStyle = $this->getServiceLocator()->get('ViewHelperManager')->get('headStyle');

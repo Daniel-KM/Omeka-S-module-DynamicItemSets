@@ -48,7 +48,7 @@ class ResourceTemplateControllerDelegator extends \Omeka\Controller\Admin\Resour
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select resource templates', // @translate
-                ]
+                ],
             ])
             ->add([
                 'name' => 'submit',
