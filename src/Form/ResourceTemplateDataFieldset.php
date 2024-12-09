@@ -233,29 +233,30 @@ class ResourceTemplateDataFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'groups',
                     'rows' => 5,
-                    'placeholder' => '# Descriptive metadata
-dcterms:title
-dcterms:description
-dcterms:type
-dcterms:source
-dcterms:relation
-
-# Indexing metadata
-dcterms:coverage
-dcterms:subject
-
-# Intellectual property metadata
-dcterms:creator
-dcterms:contributor
-dcterms:publisher
-dcterms:rights
-
-# Instantiation metadata
-dcterms:date
-dcterms:format
-dcterms:identifier
-dcterms:language
-',
+                    'placeholder' => <<<'TXT'
+                        # Descriptive metadata
+                        dcterms:title
+                        dcterms:description
+                        dcterms:type
+                        dcterms:source
+                        dcterms:relation
+                        
+                        # Indexing metadata
+                        dcterms:coverage
+                        dcterms:subject
+                        
+                        # Intellectual property metadata
+                        dcterms:creator
+                        dcterms:contributor
+                        dcterms:publisher
+                        dcterms:rights
+                        
+                        # Instantiation metadata
+                        dcterms:date
+                        dcterms:format
+                        dcterms:identifier
+                        dcterms:language
+                        TXT,
                 ],
             ])
             ->add([
