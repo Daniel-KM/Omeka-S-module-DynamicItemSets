@@ -1656,13 +1656,13 @@ class Module extends AbstractModule
             'item_set_id' => $itemSetId,
         ];
         $job = $services->get(\Omeka\Job\Dispatcher::class)->dispatch(\AdvancedResourceTemplate\Job\AttachItemsToItemSet::class, $args);
-        $urlPlugin = $services->get('ControllerPluginManager')->get('url');
+        $urlHelper = $services->get('ViewHelperManager')->get('url');
         $message = new PsrMessage(
             'The query for the item set was changed: a job is run in background to detach and to attach items (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
             [
                 'link_job' => sprintf(
                     '<a href="%s">',
-                    htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                    htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
                 ),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
@@ -1670,8 +1670,8 @@ class Module extends AbstractModule
                     '<a href="%s">',
                     // Check if module Log is enabled (avoid issue when disabled).
                     htmlspecialchars(class_exists('Log\Module', false)
-                        ? $urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
-                        : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log'])
+                        ? $urlHelper('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
+                        : $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log'])
                     )),
             ]
         );
