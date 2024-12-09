@@ -56,7 +56,7 @@ class AttachItemsToItemSet extends AbstractJob
                 if ($this->shouldStop()) {
                     return;
                 }
-                $api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'remove']);
+                $api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'remove', 'isPartial' => true]);
                 $logger->info(
                     '{count}/{total} items detached from item set #{item_set_id}.', // @translate
                     ['count' => min(++$i * 100, count($detachItemIds)), 'total' => count($detachItemIds), 'item_set_id' => $itemSetId]
@@ -72,7 +72,26 @@ class AttachItemsToItemSet extends AbstractJob
                 if ($this->shouldStop()) {
                     return;
                 }
-                $api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'append']);
+                // TODO The use of batchUpdate() may throw exception for recursive loop, so loop items here for now.
+                // $api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'append', 'isPartial' => true]);
+                foreach ($idsChunk as $id) {
+                    try {
+                        $item = $api->read('items', $id)->getContent();
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                    $item = json_decode(json_encode($item), true);
+                    // Avoid issues with duplicated item set ids. Normally none.
+                    $itemSetIds = [];
+                    foreach ($item['o:item_set'] ?? [] as $existingItemSet) {
+                        $itemSetIds[$existingItemSet['o:id']] = $existingItemSet['o:id'];
+                    }
+                    if (isset($itemSetIds[$itemSetId])) {
+                        continue;
+                    }
+                    $item['o:item_set'][] = ['o:id' => $itemSetId];
+                    $api->update('items', $id, $item, ['continueOnError' => true, 'collectionAction' => 'append', 'isPartial' => true]);
+                }
                 $logger->info(
                     '{count}/{total} new items attached to item set #{item_set_id}.', // @translate
                     ['count' => min(++$i * 100, count($newItemIds)), 'total' => count($newItemIds), 'item_set_id' => $itemSetId]
