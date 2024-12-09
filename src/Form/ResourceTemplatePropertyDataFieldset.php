@@ -13,18 +13,31 @@ class ResourceTemplatePropertyDataFieldset extends Fieldset
     {
         $this
             ->add([
-                'name' => 'input_control',
-                'type' => Element\Text::class,
+                'name' => 'min_values',
+                'type' => Element\Number::class,
                 'options' => [
-                    // Don't include leading and trailing "/", neither start/end
-                    // "^$": it's implied.
-                    'label' => 'Input control for literal (html pattern)', // @translate
-                    'documentation' => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/pattern',
+                    'label' => 'Minimum number of values (when required)', // @translate
                 ],
                 'attributes' => [
-                    // 'id' => 'input_control',
+                    // 'id' => 'min_values',
                     'class' => 'setting',
-                    'data-setting-key' => 'input_control',
+                    'data-setting-key' => 'min_values',
+                    'min' => '0',
+                    'step' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'max_values',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of values', // @translate
+                ],
+                'attributes' => [
+                    // 'id' => 'max_values',
+                    'class' => 'setting',
+                    'data-setting-key' => 'max_values',
+                    'min' => '0',
+                    'step' => '1',
                 ],
             ])
             ->add([
@@ -56,31 +69,18 @@ class ResourceTemplatePropertyDataFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'min_values',
-                'type' => Element\Number::class,
+                'name' => 'input_control',
+                'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Minimum number of values (when required)', // @translate
+                    // Don't include leading and trailing "/", neither start/end
+                    // "^$": it's implied.
+                    'label' => 'Input control for literal (html pattern)', // @translate
+                    'documentation' => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/pattern',
                 ],
                 'attributes' => [
-                    // 'id' => 'min_values',
+                    // 'id' => 'input_control',
                     'class' => 'setting',
-                    'data-setting-key' => 'min_values',
-                    'min' => '0',
-                    'step' => '1',
-                ],
-            ])
-            ->add([
-                'name' => 'max_values',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Maximum number of values', // @translate
-                ],
-                'attributes' => [
-                    // 'id' => 'max_values',
-                    'class' => 'setting',
-                    'data-setting-key' => 'max_values',
-                    'min' => '0',
-                    'step' => '1',
+                    'data-setting-key' => 'input_control',
                 ],
             ])
             ->add([
