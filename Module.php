@@ -434,6 +434,11 @@ class Module extends AbstractModule
             'api.search.query',
             [$this, 'searchDynamicItemSets']
         );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.advanced_search',
+            [$this, 'searchDynamicItemSetsPartial']
+        );
 
         // Add css/js to some admin pages.
         $sharedEventManager->attach(
@@ -1528,6 +1533,13 @@ class Module extends AbstractModule
         }
     }
 
+    public function searchDynamicItemSetsPartial(Event $event): void
+    {
+        $partials = $event->getParam('partials', []);
+        $partials[] = 'common/advanced-search/item-set-is-dynamic';
+        $event->setParam('partials', $partials);
+    }
+
     public function preBatchUpdateItems(Event $event): void
     {
         $this->isBatchUpdate = true;
@@ -1903,7 +1915,7 @@ class Module extends AbstractModule
         $element = $formManager->get(\Omeka\Form\Element\Query::class);
         $element
             ->setName('item_set_query_items')
-            ->setLabel('Query to attach items automatically to this item set') // @translate
+            ->setLabel('Query to attach items dynamically to this item set') // @translate
             ->setOptions([
                 'query_resource_type' => 'items',
             ])
