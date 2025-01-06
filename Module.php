@@ -13,7 +13,7 @@ use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Entity\Value;
+use Omeka\Api\Representation\ItemSetRepresentation;
 use Omeka\Module\AbstractModule;
 use Omeka\Mvc\Status;
 
@@ -448,6 +448,11 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\ItemSet',
             'view.details',
             [$this, 'handleItemSetDetails']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.show.sidebar',
+            [$this, 'handleItemSetSidebar']
         );
 
         // Add css/js to some admin pages.
@@ -1584,30 +1589,37 @@ class Module extends AbstractModule
 
     public function handleItemSetDetails(Event $event): void
     {
+        $itemSet = $event->getParam('entity');
+        echo $this->showItemSetDynamic($event, $itemSet);
+    }
+
+
+    public function handleItemSetSidebar(Event $event)
+    {
+        $view = $event->getTarget();
+        $itemSet = $view->vars()->offsetGet('resource');
+        echo $this->showItemSetDynamic($event, $itemSet);
+    }
+
+    protected function showItemSetDynamic(Event $event, ItemSetRepresentation $itemSet): string
+    {
         /**
          * @var \Omeka\Settings\Settings $settings
-         * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
          */
-        $view = $event->getTarget();
-        $itemSet = $event->getParam('entity');
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
+        $translate = $services->get('ControllerPluginManager')->get('translate');
 
         $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []);
 
-        $plugins = $view->getHelperPluginManager();
-        $translate = $plugins->get('translate');
-
         $title = $translate('Is dynamic');
 
-        if (isset($itemSetQueries[$itemSet->id()])) {
+        $value = isset($itemSetQueries[$itemSet->id()])
             // No need to set a link: already set in sidebar.
-            $value = $translate('Yes'); // @translate
-        } else {
-            $value = $translate('No'); // @translate
-        }
+            ? $translate('Yes') // @translate
+            : $translate('No'); // @translate
 
-        echo <<<HTML
+        return <<<HTML
             <div class="meta-group">
                 <h4>$title</h4>
                 <div class="value">$value</div>
