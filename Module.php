@@ -57,6 +57,22 @@ class Module extends AbstractModule
         }
     }
 
+    protected function postInstall()
+    {
+        // Whatever the version of AdvancedResourceTemplate, get its metadata.
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []) ?: [];
+        $settings->set('dynamicitemsets_item_set_queries', $itemSetQueries);
+
+        // Set it by default in admin for module Advanced Search.
+        $selectedSearchFields = $settings->get('advancedsearch_search_fields');
+        if ($selectedSearchFields) {
+            $selectedSearchFields[] = 'common/advanced-search/item-set-is-dynamic';
+        }
+
+        $this->postInstallAuto();
+    }
+
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         if (class_exists('AdvancedResourceTemplate', false)
