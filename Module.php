@@ -444,6 +444,11 @@ class Module extends AbstractModule
             'view.search.filters',
             [$this, 'searchDynamicItemSetsFilters']
         );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.details',
+            [$this, 'handleItemSetDetails']
+        );
 
         // Add css/js to some admin pages.
         $sharedEventManager->attach(
@@ -1575,6 +1580,40 @@ class Module extends AbstractModule
             : $translate('no'); // @translate
 
         $event->setParam('filters', $filters);
+    }
+
+    public function handleItemSetDetails(Event $event): void
+    {
+        /**
+         * @var \Omeka\Settings\Settings $settings
+         * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
+         */
+        $view = $event->getTarget();
+        $itemSet = $event->getParam('entity');
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []);
+
+        $plugins = $view->getHelperPluginManager();
+        $translate = $plugins->get('translate');
+
+        $title = $translate('Is dynamic');
+
+        if (isset($itemSetQueries[$itemSet->id()])) {
+            // No need to set a link: already set in sidebar.
+            $value = $translate('Yes'); // @translate
+        } else {
+            $value = $translate('No'); // @translate
+        }
+
+        echo <<<HTML
+            <div class="meta-group">
+                <h4>$title</h4>
+                <div class="value">$value</div>
+            </div>
+            
+            HTML;
     }
 
     public function preBatchUpdateItems(Event $event): void
