@@ -98,7 +98,7 @@ Copyright
 * Copyright Daniel Berthereau, 2023-2025 (see [Daniel-KM] on GitLab)
 
 This feature was initially present in the module [Advanced Resource Template],
-before being extracted as an independent module for the [collections of the Maison de Salins].
+before being extracted as an independent module for the [collections de la Maison de Salins].
 
 
 [Dynamic Item Sets]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets
