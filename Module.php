@@ -35,6 +35,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
         $translate = $plugins->get('translate');
+        $translator = $services->get('MvcTranslator');
 
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.65')) {
             $message = new \Omeka\Stdlib\Message(
@@ -43,10 +44,32 @@ class Module extends AbstractModule
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
+
+        // If present, AdvancedResourceTemplate should be at least 3.4.36.
+        if ($this->isModuleActive('AdvancedResourceTemplate')
+            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.36')
+        ) {
+            $message = new PsrMessage(
+                $translator->translate('If present, the module requires module "{module}" version "{version}" or greater.'), // @translate
+                ['module' => 'Advanced Resource Template', 'version' => '3.4.36']
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
+        if (class_exists('AdvancedResourceTemplate', false)
+            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.36')
+        ) {
+            $services = $this->getServiceLocator();
+            $services->get('Omeka\Logger')->err(
+                'If present, the module requires module "{module}" version "{version}" or greater.', // @translate
+                ['module' => 'Advanced Resource Template', 'version' => '3.4.36']
+            );
+            return;
+        }
+
         // Manage the items to append to item sets.
         // The item should be created to be able to do a search on it.
         // An event is needed early to update item set queries one time only.
