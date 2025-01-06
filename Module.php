@@ -439,6 +439,11 @@ class Module extends AbstractModule
             'view.advanced_search',
             [$this, 'searchDynamicItemSetsPartial']
         );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.search.filters',
+            [$this, 'searchDynamicItemSetsFilters']
+        );
 
         // Add css/js to some admin pages.
         $sharedEventManager->attach(
@@ -1538,6 +1543,38 @@ class Module extends AbstractModule
         $partials = $event->getParam('partials', []);
         $partials[] = 'common/advanced-search/item-set-is-dynamic';
         $event->setParam('partials', $partials);
+    }
+
+    public function searchDynamicItemSetsFilters(Event $event): void
+    {
+        $query = $event->getParam('query', []);
+        if (!array_key_exists('is_dynamic', $query)) {
+            return;
+        } elseif ($query['is_dynamic'] === null || $query['is_dynamic'] === '') {
+            // Clean query early.
+            unset($query['is_dynamic']);
+            $event->getParam('query', $query);
+            return;
+        }
+
+        $view = $event->getTarget();
+        $plugins = $view->getHelperPluginManager();
+        $translate = $plugins->get('translate');
+
+        $filters = $event->getParam('filters', []);
+        $filterLabel = $translate('Is dynamic'); // @translate
+
+        // Manage the module Advanced Search that may add the filter previously.
+        if (isset($filters[$filterLabel])) {
+            return;
+        }
+
+        $value = (bool) $query['is_dynamic'];
+        $filters[$filterLabel][] = $value
+            ? $translate('yes') // @translate
+            : $translate('no'); // @translate
+
+        $event->setParam('filters', $filters);
     }
 
     public function preBatchUpdateItems(Event $event): void
