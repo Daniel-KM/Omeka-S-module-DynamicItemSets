@@ -428,6 +428,13 @@ class Module extends AbstractModule
             [$this, 'handleViewResourceShowValue']
         );
 
+        // Search dynamic queries with "is_dynamic=0" or "is_dynamic=1".
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.search.query',
+            [$this, 'searchDynamicItemSets']
+        );
+
         // Add css/js to some admin pages.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
@@ -1476,6 +1483,49 @@ class Module extends AbstractModule
         }
 
         echo implode(' ', array_filter($result, 'strlen'));
+    }
+
+    public function searchDynamicItemSets(Event $event): void
+    {
+        $query = $event->getParam('request')->getContent();
+        if (!array_key_exists('is_dynamic', $query)) {
+            return;
+        } elseif ($query['is_dynamic'] === null || $query['is_dynamic'] === '') {
+            // Clean query early.
+            unset($query['is_dynamic']);
+            $event->getParam('query', $query);
+            return;
+        }
+
+        /**
+         * @var \Omeka\Settings\Settings $settings
+         * @var \Omeka\Api\Adapter\ItemSetAdapter $adapter
+         * @var \Doctrine\ORM\QueryBuilder $qb
+         */
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $adapter = $event->getTarget();
+        $qb = $event->getParam('queryBuilder');
+        $expr = $qb->expr();
+
+        $isDynamic = (bool) $query['is_dynamic'];
+        $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []);
+
+        if (!$itemSetQueries) {
+            if ($isDynamic) {
+                $qb->andWhere($expr->eq('omeka_root.id', 0));
+            }
+        } elseif ($isDynamic) {
+            $qb->andWhere($expr->in(
+                'omeka_root.id',
+                $adapter->createNamedParameter($qb, array_keys($itemSetQueries))
+            ));
+        } else {
+            $qb->andWhere($expr->notIn(
+                'omeka_root.id',
+                $adapter->createNamedParameter($qb, array_keys($itemSetQueries))
+            ));
+        }
     }
 
     public function preBatchUpdateItems(Event $event): void
