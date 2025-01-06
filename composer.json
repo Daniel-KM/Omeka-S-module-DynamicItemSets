@@ -1,6 +1,6 @@
 {
-    "name": "daniel-km/omeka-s-module-advanced-resource-template",
-    "description": "Module for Omeka S to add new features to the resource templates to simplify and to improve the edition of resources: closed template, auto-completion, select language, lock, auto-filling, etc.",
+    "name": "daniel-km/omeka-s-module-dynamic-item-sets",
+    "description": "Module for Omeka S to attach items to item sets automatically with a standard query.",
     "type": "library",
     "license": "CECILL-2.1",
     "authors": [
@@ -9,9 +9,9 @@
             "email": "Daniel.git@Berthereau.net"
         }
     ],
-    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedResourceTemplate",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets",
     "support": {
-        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedResourceTemplate/-/issues",
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues",
         "forum": "https://forum.omeka.org/"
     },
     "keywords": [
@@ -19,51 +19,5 @@
         "Omeka S module",
         "resource edition",
         "curation"
-    ],
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "devbridge/jquery-autocomplete",
-                "version": "1.4.11",
-                "type": "omeka-addon-asset",
-                "dist": {
-                    "type": "file",
-                    "url": "https://github.com/devbridge/jQuery-Autocomplete/raw/master/dist/jquery.autocomplete.min.js",
-                    "reference": ""
-                }
-            }
-        }
-    ],
-    "require": {
-        "oomphinc/composer-installers-extender": "^2.0",
-        "devbridge/jquery-autocomplete": "1.4.11"
-    },
-    "extra": {
-        "installer-types": ["omeka-addon-asset"],
-        "installer-paths": {
-            "asset/vendor/{$name}/": [
-                "type:omeka-addon-asset"
-            ]
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
-        }
-    },
-    "scripts": {
-        "post-install-cmd": "@build",
-        "post-update-cmd": "@build",
-        "build": [
-            "# Fix https://github.com/devbridge/jQuery-Autocomplete/pull/811",
-            "@php -r '$f = __DIR__ . \"/asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js\"; file_put_contents($f, str_replace(\",200)\", \",350)\", file_get_contents($f)));'"
-        ]
-    },
-    "config": {
-        "allow-plugins": {
-            "composer/installers": true,
-            "oomphinc/composer-installers-extender": true
-        }
-    }
+    ]
 }

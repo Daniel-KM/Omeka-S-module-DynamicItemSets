@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedResourceTemplate\Job;
+namespace DynamicItemSets\Job;
 
 use Omeka\Job\AbstractJob;
 
@@ -21,7 +21,7 @@ class AttachItemsToItemSet extends AbstractJob
 
         // The reference id is the job id for now.
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-        $referenceIdProcessor->setReferenceId('art/attach_to_itemset/job_' . $this->job->getId());
+        $referenceIdProcessor->setReferenceId('dynis/attach_to_itemset/job_' . $this->job->getId());
         $logger->addProcessor($referenceIdProcessor);
 
         $itemSetId = (int) $this->getArg('item_set_id');
@@ -40,7 +40,7 @@ class AttachItemsToItemSet extends AbstractJob
             return;
         }
 
-        $queries = $settings->get('advancedresourcetemplate_item_set_queries') ?: [];
+        $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
         $query = $queries[$itemSetId] ?? null;
 
         $existingItemIds = $api->search('items', ['item_set_id' => $itemSetId], ['returnScalar' => 'id'])->getContent();
