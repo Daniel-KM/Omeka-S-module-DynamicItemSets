@@ -14,6 +14,7 @@ For example, it is possible to create an item set bringing together all the
 items with blue color, or all items with type Audio or all items of the 14th
 century, or any other query adapted to your item sets.
 
+![Automatic attachment of items to item sets](data/images/auto-attach_items_to_item_sets.png)
 
 Installation
 ------------
@@ -36,12 +37,19 @@ the module to `DynamicItemSets`.
 Usage
 -----
 
-There is no difference between dynamic item sets and others. It is recommended
-to use a specific resource model or to add a property with a boolean (module
-[Data Type Rdf]) to use them more easily.
-
 To make an item set dynamic, simply define the query that will define its items
 via the field in the Advanced tab of item set edition.
+
+When a query is set in the tab Advanced of the item set form, all existing and
+new items will be automatically attached to this item set, according to the
+request.
+
+Warning: items that are manually attached to the item set will be automatically
+detached if they are not in the results of the request.
+
+There is no difference between dynamic item sets and others. So, it is
+recommended to use a specific resource model or to add a property with a boolean
+(module [Data Type Rdf]) to identify and to use them more easily.
 
 Dynamic item sets can be identified via the advanced search with the "Is dynamic"
 radio button or by adding `is_dynamic=1` in the url (https://example.org/admin/item-set?is_dynamic=1)
@@ -106,6 +114,7 @@ before being extracted as an independent module for the [collections de la Maiso
 [Omeka S]: https://omeka.org/s
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf
 [DynamicItemSets.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/releases
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf/-/releases
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues

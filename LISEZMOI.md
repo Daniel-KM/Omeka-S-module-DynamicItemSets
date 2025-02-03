@@ -14,6 +14,8 @@ Par exemple, il est possible de créer une collection rassemblant tous les
 contenus de couleur bleu ou tous les contenus de type Audio ou tous les contenus
 du 14e siècle, ou tout autre requête adaptée à vos collections.
 
+![Placement automatique des contenus dans les collections](data/images/auto-attach_items_to_item_sets.png)
+
 
 Installation
 ------------
@@ -36,14 +38,22 @@ en `DynamicItemSets`.
 Utilisation
 -----------
 
+Pour rendre une collection dynamique, il suffit de définir la requête qui va
+en définir les contenus via le champ dans l’onglet Avancé de l’édition d’une
+collection.
+
+En indiquant une requête dans l’onglet Avancé du formulaire de collection,
+tous les contenus existants et les nouveaux seront automatiquement placés dans
+cette collection conformément à la requête.
+
+Attention : les contenus placés manuellement dans la collection seront
+automatiquement détachés s’ils ne se trouvent pas dans les résultats de la
+requête.
+
 Il n’y a pas de différence entre les collections dynamiques et les autres. Il
 est recommandé d’utiliser un modèle de ressource spécifique ou d’ajouter une
 propriété avec un booléen (module [Data Type Rdf]) pour les utiliser plus
 facilement.
-
-Pour rendre une collection dynamique, il suffit de définir la requête qui va
-en définir les contenus via le champ dans l’onglet Avancé de l’édition d’une
-collection.
 
 Il est possible de les identifier via la recherche avancée avec le bouton radio
 "Est dynamique" ou en ajoutant `is_dynamic=1` dans l’url (https://example.org/admin/item-set?is_dynamic=1)
@@ -119,6 +129,7 @@ avant d’en être extraite pour en faire un module indépendant pour le site de
 [Omeka S]: https://omeka.org/s
 [installer un module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf
 [DynamicItemSets.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/releases
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf/-/releases
 [questions du module]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues
