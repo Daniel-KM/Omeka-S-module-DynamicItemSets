@@ -3,6 +3,11 @@
 namespace DynamicItemSets;
 
 return [
+    'view_helpers' => [
+        'invokables' => [
+            'dynamicItemSetQuery' => View\Helper\DynamicItemSetQuery::class,
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
