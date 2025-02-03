@@ -47,11 +47,11 @@ class Module extends AbstractModule
 
         // If present, AdvancedResourceTemplate should be at least 3.4.36.
         if ($this->isModuleActive('AdvancedResourceTemplate')
-            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.36')
+            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
         ) {
             $message = new PsrMessage(
-                $translator->translate('If present, the module requires module "{module}" version "{version}" or greater.'), // @translate
-                ['module' => 'Advanced Resource Template', 'version' => '3.4.36']
+                $translator->translate('When present, the module requires module {module} version {version} or greater.'), // @translate
+                ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
@@ -61,6 +61,11 @@ class Module extends AbstractModule
     {
         // Whatever the version of AdvancedResourceTemplate, get its metadata.
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        $currents = $settings->get('dynamicitemsets_item_set_queries');
+        if (!empty($currents)) {
+            return;
+        }
+
         $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []) ?: [];
         $settings->set('dynamicitemsets_item_set_queries', $itemSetQueries);
 
@@ -76,13 +81,20 @@ class Module extends AbstractModule
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         if (class_exists('AdvancedResourceTemplate', false)
-            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.36')
+            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
         ) {
             $services = $this->getServiceLocator();
             $services->get('Omeka\Logger')->err(
-                'If present, the module requires module "{module}" version "{version}" or greater.', // @translate
-                ['module' => 'Advanced Resource Template', 'version' => '3.4.36']
+                'When present, the module requires module {module} version {version} or greater.', // @translate
+                ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
             );
+            $translate = $services->get('ControllerPluginManager')->get('translate');
+            $message = new \Common\Stdlib\PsrMessage(
+                $translate('Some features require the module {module} to be upgraded to version {version} or later.'), // @translate
+                ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
+            );
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addWarning($message);
             return;
         }
 
