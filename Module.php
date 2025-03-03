@@ -57,7 +57,7 @@ class Module extends AbstractModule
         }
     }
 
-    protected function postInstall()
+    protected function postInstall(): void
     {
         // Whatever the version of AdvancedResourceTemplate, get its metadata.
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
@@ -80,24 +80,6 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        if (class_exists('AdvancedResourceTemplate', false)
-            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
-        ) {
-            $services = $this->getServiceLocator();
-            $services->get('Omeka\Logger')->err(
-                'When present, the module requires module {module} version {version} or greater.', // @translate
-                ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
-            );
-            $translate = $services->get('ControllerPluginManager')->get('translate');
-            $message = new \Common\Stdlib\PsrMessage(
-                $translate('Some features require the module {module} to be upgraded to version {version} or later.'), // @translate
-                ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
-            );
-            $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning($message);
-            return;
-        }
-
         // Manage the items to append to item sets.
         // The item should be created to be able to do a search on it.
         // An event is needed early to update item set queries one time only.
@@ -261,8 +243,7 @@ class Module extends AbstractModule
         echo $this->showItemSetDynamic($event, $itemSet);
     }
 
-
-    public function handleItemSetSidebar(Event $event)
+    public function handleItemSetSidebar(Event $event): void
     {
         $view = $event->getTarget();
         $itemSet = $view->vars()->offsetGet('resource');
