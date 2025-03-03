@@ -414,16 +414,19 @@ class Module extends AbstractModule
 
         // Store queries as array for cleaner storage and to avoid to parse it
         // each time and for quicker process.
+        $query = null;
         $queryString = $request->getValue('item_set_query_items') ?: null;
         if ($queryString) {
-            $query = null;
             parse_str($queryString, $query);
         }
 
-        if (empty($query)) {
-            unset($queries[$itemSetId]);
-            $query = null;
-        } else {
+        // Quick clean for most of the cases.
+        if ($query) {
+            $this->arrayFilterRecursiveEmpty($query);
+        }
+
+        if (!empty($query)) {
+            // Clean the query.
             // Simplify the query for "id" if any (normally not present).
             if (empty($query['id'])) {
                 unset($query['id']);
@@ -451,6 +454,11 @@ class Module extends AbstractModule
                 }
             }
             $queries[$itemSetId] = $query;
+        }
+
+        if (empty($query)) {
+            unset($queries[$itemSetId]);
+            $query = null;
         }
 
         $settings->set('dynamicitemsets_item_set_queries', $queries);
@@ -586,5 +594,27 @@ class Module extends AbstractModule
         if ($process === 'dynis_reindex') {
             $event->setParam('job', \DynamicItemSets\Job\AttachItemsToItemSets::class);
         }
+    }
+
+    /**
+     * Clean an array recursively, removing empty values ("", null and []).
+     *
+     * "0" is a valid value, and the same for 0 and false.
+     * It is mainly used to clean a url query.
+     *
+     * @param array $array The array is passed by reference.
+     * @return array
+     */
+    protected function arrayFilterRecursiveEmpty(array &$array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->arrayFilterRecursiveEmpty($value);
+            }
+            if ($array[$key] === '' || $array[$key] === [] || $array[$key] === null) {
+                unset($array[$key]);
+            }
+        }
+        return $array;
     }
 }
