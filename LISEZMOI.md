@@ -34,6 +34,9 @@ livraisons et décompresser le dans le dossier `modules`.
 Si le module est installé depuis la source, renommez le nom du dossier du module
 en `DynamicItemSets`.
 
+Le module [Easy Admin] peut être installé pour lancer la réindexation de toutes
+les collections.
+
 
 Utilisation
 -----------
@@ -51,7 +54,7 @@ automatiquement détachés s’ils ne se trouvent pas dans les résultats de la
 requête.
 
 Il n’y a pas de différence entre les collections dynamiques et les autres. Il
-est recommandé d’utiliser un modèle de ressource spécifique ou d’ajouter une
+est parfois utile d’utiliser un modèle de ressource spécifique ou d’ajouter une
 propriété avec un booléen (module [Data Type Rdf]) pour les utiliser plus
 facilement.
 
@@ -59,11 +62,14 @@ Il est possible de les identifier via la recherche avancée avec le bouton radio
 "Est dynamique" ou en ajoutant `is_dynamic=1` dans l’url (https://example.org/admin/item-set?is_dynamic=1)
 ou de les exclure avec `is_dynamic=0`.
 
+Quand la requête est supprimée, la collection devient une collection statique et
+les contenus existants demeurent attachés.
+
 
 TODO
 ----
 
-- [ ] Ajouter la colonne dans la navigation des collections.
+- [x] Ajouter la colonne dans la navigation des collections.
 
 
 Avertissement
@@ -121,7 +127,8 @@ Copyright
 
 Cette fonctionnalité était initialement présente dans le module [Modèle de ressources avancé]
 avant d’en être extraite pour en faire un module indépendant pour le site des
-[collections de la Maison de Salins].
+[collections de la Maison de Salins]. Les évolutions ont été réalisées pour la
+[Curiothèque] de l’[Institut Curie].
 
 
 [Collections dynamiques]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedResourceTemplate
@@ -132,6 +139,7 @@ avant d’en être extraite pour en faire un module indépendant pour le site de
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf
 [DynamicItemSets.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/releases
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf/-/releases
+[Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [questions du module]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
@@ -140,5 +148,7 @@ avant d’en être extraite pour en faire un module indépendant pour le site de
 [MIT]: http://opensource.org/licenses/MIT
 [Modèle de ressources avancé]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedResourceTemplate/-/blob/master/LISEZMOI.md
 [collections de la Maison de Salins]: https://collections.maison-salins.fr/
+[Curiothèque]: https://curiotheque.musee.curie.fr/
+[Institut Curie]: https://curie.fr/
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
