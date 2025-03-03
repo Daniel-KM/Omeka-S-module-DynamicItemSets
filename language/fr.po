@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 00:00+0000\n"
+"POT-Creation-Date: 2025-03-03 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -17,20 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: Module.php:42
+#: data/scripts/upgrade.php:38 Module.php:42
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: Module.php:53
+#: data/scripts/upgrade.php:48
 msgid ""
-"If present, the module requires module \"{module}\" version \"{version}\" or "
-"greater."
+"To avoid compatibility issue, the module {module} should be version "
+"{version} or greater."
 msgstr ""
-"Certaines fonctionnalités nécessitent que le module {module} soit mis à "
+"Pour éviter des problèmes de compatibilités, le module {module} doit mis à "
 "niveau à la version {version} ou supérieure."
 
-#: Module.php:225 Module.php:265
+#: Module.php:53
+msgid ""
+"When present, the module requires module {module} version {version} or "
+"greater."
+msgstr ""
+"Lorsqu’il est présent, le module nécessite que le module {module} soit mis à "
+"niveau à la version {version} ou supérieure."
+
+#: Module.php:246 Module.php:285
 msgid "Is dynamic"
 msgstr "Est dynamique"
 
@@ -38,13 +46,21 @@ msgstr "Est dynamique"
 msgid "Search dynamic item sets"
 msgstr "Rechercher les collections dynamiques"
 
-#: Module.php:437
+#: data/scripts/upgrade.php:72
+msgid ""
+"The attached items to an item set are no more detached when the query is "
+"removed."
+msgstr ""
+"Les contenus attachés à une collection ne sont plus détachés quand la "
+"requête est supprimée."
+
+#: Module.php:460
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 "La requête pour attacher les contenus ne peut pas contenir la collection "
 "elle-même."
 
-#: Module.php:461
+#: Module.php:490
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
@@ -54,9 +70,13 @@ msgstr ""
 "plan pour détacher et attacher les contenus ({link_job}tâche #{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: Module.php:547
+#: Module.php:577
 msgid "Query to attach items dynamically to this item set"
 msgstr "Requête pour placer dynamiquement les contenus dans cette collection"
+
+#: Module.php:598
+msgid "Dynamic item sets: Reindex item sets"
+msgstr "Collections dynamiques : Ré-indexer les collections"
 
 #: view/common/advanced-search/item-set-is-dynamic.phtml:13
 msgid "Is dynamic item set"
@@ -70,31 +90,65 @@ msgstr "N’est pas dynamique"
 msgid "Any"
 msgstr "Tous"
 
-#: src/Job/AttachItemsToItemSet.php:29
-msgid "No item set defined."
-msgstr "Aucune collection définie."
+#: src/Job/AttachItemsToItemSets.php:50
+msgid "No item set to process."
+msgstr "Aucune collection à ré-indexer."
 
-#: src/Job/AttachItemsToItemSet.php:37
-msgid "The item set #{item_set_id} does not exist."
-msgstr "La collection #{item_set_id} n’existe pas."
+#: src/Job/AttachItemsToItemSets.php:62
+msgid "Processing attach/detach items from {total} item sets."
+msgstr "Traitement des attachements et détachements de {total} collections."
 
-#: src/Job/AttachItemsToItemSet.php:61
+#: src/Job/AttachItemsToItemSets.php:76
+msgid ""
+"The following item sets does not exist or you don’t have the right to manage "
+"them: #{item_set_ids}."
+msgstr ""
+"Les collections suivantes n’existent pas ou vous n’avez pas le droit de les "
+"gérer : #{item_set_ids}."
+
+#: src/Job/AttachItemsToItemSets.php:99
+msgid ""
+"The following item sets have no more query and items attached to it are "
+"kept: #{item_set_ids}."
+msgstr ""
+"Les collections suivantes n’ont plus de requête et les contenus qui y sont "
+"attachés sont conservés : #{item_set_ids}."
+
+#: src/Job/AttachItemsToItemSets.php:108
+msgid "No more item sets to process."
+msgstr "Aucune collection à ré-indexer."
+
+#: src/Job/AttachItemsToItemSets.php:130
+msgid "Processing attach/detach items from {total} item sets ended."
+msgstr ""
+"Traitement terminé pour les attachements et détachements de {total} "
+"collections."
+
+#: src/Job/AttachItemsToItemSets.php:157
+msgid "{total} items detached from item set #{item_set_id}."
+msgstr "{total} contenus détachés de la collection #{item_set_id}."
+
+#: src/Job/AttachItemsToItemSets.php:162
 msgid "{count}/{total} items detached from item set #{item_set_id}."
 msgstr "{count}/{total} contenus détachés de la collection #{item_set_id}."
 
-#: src/Job/AttachItemsToItemSet.php:96
+#: src/Job/AttachItemsToItemSets.php:202
+msgid "{total} new items attached to item set #{item_set_id}."
+msgstr "{total} nouveaux contenus attachés à la collection #{item_set_id}."
+
+#: src/Job/AttachItemsToItemSets.php:207
 msgid "{count}/{total} new items attached to item set #{item_set_id}."
 msgstr ""
 "{count}/{total} nouveaux contenus attachés à la collection #{item_set_id}."
 
-#: src/Job/AttachItemsToItemSet.php:103
+#: src/Job/AttachItemsToItemSets.php:217
 msgid ""
 "Process ended for item set #{item_set_id}: {count} items were attached, "
 "{count_2} items were detached, {count_3} new items were attached."
 msgstr ""
-"Process terminé pour la collection #{item_set_id} : {count} contenus étaient "
-"attachés, {count_2} contenus ont été détachés, {count_3} nouveaux contenus "
-"ont été attachés."
+"Traitement terminé pour la collection #{item_set_id} : {count} contenus "
+"étaient attachés, {count_2} contenus ont été détachés, {count_3} nouveaux "
+"contenus ont été attachés."
 
 #~ msgid "Search this value"
 #~ msgstr "Rechercher cette valeur"
