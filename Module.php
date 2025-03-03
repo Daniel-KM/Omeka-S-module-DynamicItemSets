@@ -452,9 +452,9 @@ class Module extends AbstractModule
         // calls (indexations).
         // Use a job: the process via api can be long with many items.
         $args = [
-            'item_set_id' => $itemSetId,
+            'item_set_ids' => [$itemSetId],
         ];
-        $job = $services->get(\Omeka\Job\Dispatcher::class)->dispatch(\DynamicItemSets\Job\AttachItemsToItemSet::class, $args);
+        $job = $services->get(\Omeka\Job\Dispatcher::class)->dispatch(\DynamicItemSets\Job\AttachItemsToItemSets::class, $args);
         $urlHelper = $services->get('ViewHelperManager')->get('url');
         $message = new PsrMessage(
             'The query for the item set was changed: a job is run in background to detach and to attach items (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
