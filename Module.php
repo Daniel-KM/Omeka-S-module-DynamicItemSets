@@ -67,6 +67,15 @@ class Module extends AbstractModule
         }
 
         $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []) ?: [];
+        foreach ($itemSetQueries as $key => $query) {
+            $this->arrayFilterRecursiveEmpty($query);
+            if ($query) {
+                $itemSetQueries[$key] = $query;
+            } else {
+                unset($itemSetQueries[$key]);
+            }
+        }
+        ksort($itemSetQueries);
         $settings->set('dynamicitemsets_item_set_queries', $itemSetQueries);
 
         // Set it by default in admin for module Advanced Search.
@@ -461,6 +470,7 @@ class Module extends AbstractModule
             $query = null;
         }
 
+        ksort($queries);
         $settings->set('dynamicitemsets_item_set_queries', $queries);
 
         if (!$query || $query === $existingQuery) {
@@ -539,6 +549,7 @@ class Module extends AbstractModule
                 )
                 ->fetchAllKeyValue();
             $queries = array_intersect_key($queries, $itemSetIds);
+            ksort($queries);
             $settings->set('dynamicitemsets_item_set_queries', $queries);
         }
 
