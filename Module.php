@@ -443,7 +443,7 @@ class Module extends AbstractModule
 
         $settings->set('dynamicitemsets_item_set_queries', $queries);
 
-        if ($query === $existingQuery) {
+        if (!$query || $query === $existingQuery) {
             return;
         }
 

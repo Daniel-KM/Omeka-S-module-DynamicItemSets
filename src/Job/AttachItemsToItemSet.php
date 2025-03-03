@@ -43,6 +43,14 @@ class AttachItemsToItemSet extends AbstractJob
         $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
         $query = $queries[$itemSetId] ?? null;
 
+        if (!$query) {
+            $logger->notice(
+                'The item set #{item_set_id} has no more query and items attached to it are kept.', // @translate
+                ['item_set_id' => $itemSetId]
+            );
+            return;
+        }
+
         $existingItemIds = $api->search('items', ['item_set_id' => $itemSetId], ['returnScalar' => 'id'])->getContent();
         $newItemIds = $query ? $api->search('items', $query, ['returnScalar' => 'id'])->getContent() : [];
 
