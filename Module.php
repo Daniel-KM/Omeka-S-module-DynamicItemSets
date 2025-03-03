@@ -153,6 +153,18 @@ class Module extends AbstractModule
             'view.edit.form.advanced',
             [$this, 'addAdvancedTabElements']
         );
+
+        // Add a job to update item sets.
+        $sharedEventManager->attach(
+            \EasyAdmin\Form\CheckAndFixForm::class,
+            'form.add_elements',
+            [$this, 'handleEasyAdminJobsForm']
+        );
+        $sharedEventManager->attach(
+            \EasyAdmin\Controller\Admin\CheckAndFixController::class,
+            'easyadmin.job',
+            [$this, 'handleEasyAdminJobs']
+        );
     }
 
     public function searchDynamicItemSets(Event $event): void
@@ -552,5 +564,27 @@ class Module extends AbstractModule
                 'value' => $query,
             ]);
         echo $view->formRow($element);
+    }
+
+    public function handleEasyAdminJobsForm(Event $event): void
+    {
+        /**
+         * @var \EasyAdmin\Form\CheckAndFixForm $form
+         * @var \Laminas\Form\Element\Radio $process
+         */
+        $form = $event->getTarget();
+        $fieldset = $form->get('module_tasks');
+        $process = $fieldset->get('process');
+        $valueOptions = $process->getValueOptions();
+        $valueOptions['dynis_reindex'] = 'Dynamic item sets: Reindex item sets'; // @translate
+        $process->setValueOptions($valueOptions);
+    }
+
+    public function handleEasyAdminJobs(Event $event): void
+    {
+        $process = $event->getParam('process');
+        if ($process === 'dynis_reindex') {
+            $event->setParam('job', \DynamicItemSets\Job\AttachItemsToItemSets::class);
+        }
     }
 }
