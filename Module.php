@@ -266,16 +266,16 @@ class Module extends AbstractModule
     {
         /**
          * @var \Omeka\Settings\Settings $settings
+         * @var \DynamicItemSets\View\Helper\DynamicItemSetQuery $dynamicItemSetQuery
          */
         $services = $this->getServiceLocator();
-        $settings = $services->get('Omeka\Settings');
-        $translate = $services->get('ControllerPluginManager')->get('translate');
-
-        $itemSetQueries = $settings->get('dynamicitemsets_item_set_queries', []);
+        $plugins = $services->get('ViewHelperManager');
+        $translate = $plugins->get('translate');
+        $dynamicItemSetQuery = $plugins->get('dynamicItemSetQuery');
 
         $title = $translate('Is dynamic');
 
-        $value = isset($itemSetQueries[$itemSet->id()])
+        $value = $dynamicItemSetQuery($itemSet)
             // No need to set a link: already set in sidebar.
             ? $translate('Yes') // @translate
             : $translate('No'); // @translate

@@ -13,6 +13,11 @@ return [
             dirname(__DIR__) . '/view',
         ],
     ],
+    'column_types' => [
+        'invokables' => [
+            'is_dynamic' => ColumnType\IsDynamic::class,
+        ],
+    ],
     'translator' => [
         'translation_file_patterns' => [
             [
