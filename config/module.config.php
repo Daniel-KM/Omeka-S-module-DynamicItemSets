@@ -29,7 +29,7 @@ return [
         ],
     ],
     'dynamicitemsets' => [
-        'settings' => [
+        'config' => [
             // Hidden settings.
             'dynamicitemsets_item_set_queries' => [],
         ],
