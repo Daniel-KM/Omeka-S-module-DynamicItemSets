@@ -608,17 +608,47 @@ class Module extends AbstractModule
          */
         $form = $event->getTarget();
         $fieldset = $form->get('module_tasks');
+
         $process = $fieldset->get('process');
         $valueOptions = $process->getValueOptions();
         $valueOptions['dynis_reindex'] = 'Dynamic item sets: Reindex item sets'; // @translate
         $process->setValueOptions($valueOptions);
+
+        $fieldset
+            ->add([
+                'type' => \Laminas\Form\Fieldset::class,
+                'name' => 'dynis_reindex_settings',
+                'options' => [
+                    'label' => 'Options to reindex dynamic item sets', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'dynis_reindex',
+                ],
+            ])
+            ->get('dynis_reindex_settings')
+            ->add([
+                'name' => 'via_api',
+                'type' => \Laminas\Form\Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Run events', // @translate
+                    'info' => 'This option is used to reindex external search engine at the same time, but it is generally simpler to reindex it separately.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'dynis_reindex_settings-via_api',
+                ],
+            ])
+        ;
     }
 
     public function handleEasyAdminJobs(Event $event): void
     {
         $process = $event->getParam('process');
         if ($process === 'dynis_reindex') {
+            $params = $event->getParam('params');
             $event->setParam('job', \DynamicItemSets\Job\AttachItemsToItemSets::class);
+            $event->setParam('args', [
+                'direct' => empty($params['module_tasks']['dynis_reindex_settings']['via_api']),
+            ]);
         }
     }
 

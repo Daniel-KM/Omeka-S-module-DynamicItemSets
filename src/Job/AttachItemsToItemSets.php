@@ -12,6 +12,11 @@ class AttachItemsToItemSets extends AbstractJob
     protected $api;
 
     /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
@@ -37,6 +42,7 @@ class AttachItemsToItemSets extends AbstractJob
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
+        $this->connection = $services->get('Omeka\Connection');
         $this->entityManager = $services->get('Omeka\EntityManager');
 
         // The reference id is the job id for now.
@@ -50,6 +56,8 @@ class AttachItemsToItemSets extends AbstractJob
             $this->logger->info('No item set to process.'); // @translate
             return;
         }
+
+        $useDirectSql = (bool) $this->getArg('direct');
 
         $settings = $services->get('Omeka\Settings');
         $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
@@ -118,10 +126,26 @@ class AttachItemsToItemSets extends AbstractJob
         // item sets. And each item may not have the same item sets to remove
         // and append. And in fact, batch update is a loop on update.
         // So the two strategies are probably similar in real cases.
+        // A third strategy is to process via sql and to do a simple loop on
+        // items and item sets.
+
+        // In direct mode, detach all item sets early.
+        // This is useless with "on duplicate key update".
+        /*
+        if ($useDirectSql) {
+            $sql = <<<'SQL'
+                DELETE FROM `item_item_set`
+                WHERE `item_set_id` IN (:item_set_ids);
+                SQL;
+            $this->connection->executeStatement($sql, ['item_set_ids' => $itemSetIds], ['item_set_ids' => Connection::PARAM_INT_ARRAY]);
+        }
+        */
 
         // Detach all item sets.
         foreach ($itemSetIds as $itemSetId) {
-            $this->attachItemsToItemSet($itemSetId, $queries[$itemSetId]);
+            $useDirectSql
+                ? $this->attachItemsToItemSet($itemSetId, $queries[$itemSetId])
+                : $this->attachItemsToItemSetFull($itemSetId, $queries[$itemSetId]);
             $this->entityManager->flush();
             $this->entityManager->clear();
         }
@@ -133,6 +157,28 @@ class AttachItemsToItemSets extends AbstractJob
     }
 
     protected function attachItemsToItemSet(int $itemSetId, array $query): void
+    {
+        $newItemIds = $this->api->search('items', $query, ['returnScalar' => 'id'])->getContent();
+        $newItemIds = array_values(array_map('intval', $newItemIds));
+
+        // Default size of mysql/mariadb is 4MB, so about 200000 rows in big
+        // bases, but in big bases, the max size of the request is probably
+        // increased.
+        foreach (array_chunk($newItemIds, 100000) as $ids) {
+            $values = '(' . implode(",$itemSetId),\n(", $ids) . ",$itemSetId)";
+            $sql = <<<SQL
+                INSERT INTO `item_item_set` (`item_id`, `item_set_id`)
+                VALUES
+                $values
+                ON DUPLICATE KEY UPDATE
+                `item_id` = `item_id`,
+                `item_set_id` = `item_set_id`;
+                SQL;
+            $this->connection->executeStatement($sql);
+        }
+    }
+
+    protected function attachItemsToItemSetFull(int $itemSetId, array $query): void
     {
         $existingItemIds = $this->api->search('items', ['item_set_id' => $itemSetId], ['returnScalar' => 'id'])->getContent();
         $newItemIds = $this->api->search('items', $query, ['returnScalar' => 'id'])->getContent();
