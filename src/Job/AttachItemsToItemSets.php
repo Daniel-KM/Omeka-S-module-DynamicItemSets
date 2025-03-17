@@ -128,6 +128,7 @@ class AttachItemsToItemSets extends AbstractJob
         // So the two strategies are probably similar in real cases.
         // A third strategy is to process via sql and to do a simple loop on
         // items and item sets.
+        // This is the used one. See previous commits for second way.
 
         // In direct mode, detach all item sets early.
         // This is useless with "on duplicate key update".
@@ -141,14 +142,44 @@ class AttachItemsToItemSets extends AbstractJob
         }
         */
 
-        // Detach all item sets.
+        // Update all item sets.
         foreach ($itemSetIds as $itemSetId) {
-            $useDirectSql
-                ? $this->attachItemsToItemSet($itemSetId, $queries[$itemSetId])
-                : $this->attachItemsToItemSetFull($itemSetId, $queries[$itemSetId]);
-            $this->entityManager->flush();
-            $this->entityManager->clear();
+            if (!$useDirectSql) {
+                $existingItemIds = $this->api->search('items', ['item_set_id' => $itemSetId], ['returnScalar' => 'id'])->getContent();
+                $existingItemIds = array_values(array_map('intval', $existingItemIds));
+            }
+
+            $newItemIds = $this->attachItemsToItemSet($itemSetId, $queries[$itemSetId]);
+            $countItemIds = count($newItemIds);
+
+            if ($useDirectSql) {
+                $this->logger->info(
+                    'Process ended for item set #{item_set_id}: {count} items are attached.', // @translate
+                    ['item_set_id' => $itemSetId, 'count' => $countItemIds]
+                );
+            } else {
+                // Update the item set itself.
+                // The event for current item set should not run recursively:
+                // the query didn't change.
+                $this->api->update('item_sets', $itemSetId, [], [], ['isPartial' => true]);
+                // Then loop items to run events.
+                // Don't run twice on items that were not updated: loop only
+                // removed and new items.
+                $detachedItemIds = array_diff($existingItemIds, $newItemIds);
+                $newItemIds = $newItemIds ? array_diff($newItemIds, $existingItemIds) : [];
+                $countNewItemIds = count($newItemIds);
+                $newItemIds = array_merge($detachedItemIds, $newItemIds);
+                sort($newItemIds);
+                $this->loopItems($itemSetId, $newItemIds);
+                $this->logger->info(
+                    'Process ended for item set #{item_set_id}: {count} items were attached, {count_2} items were detached, {count_3} new items were attached.', // @translate
+                    ['item_set_id' => $itemSetId, 'count' => count($existingItemIds), 'count_2' => count($detachedItemIds), 'count_3' => $countNewItemIds]
+                );
+            }
         }
+
+        $this->entityManager->flush();
+        $this->entityManager->clear();
 
         $this->logger->info(
             'Processing attach/detach items from {total} item sets ended.', // @translate
@@ -156,7 +187,7 @@ class AttachItemsToItemSets extends AbstractJob
         );
     }
 
-    protected function attachItemsToItemSet(int $itemSetId, array $query): void
+    protected function attachItemsToItemSet(int $itemSetId, array $query): array
     {
         $newItemIds = $this->api->search('items', $query, ['returnScalar' => 'id'])->getContent();
         $newItemIds = array_values(array_map('intval', $newItemIds));
@@ -176,92 +207,31 @@ class AttachItemsToItemSets extends AbstractJob
                 SQL;
             $this->connection->executeStatement($sql);
         }
+
+        return $newItemIds;
     }
 
-    protected function attachItemsToItemSetFull(int $itemSetId, array $query): void
+    protected function loopItems(int $itemSetId, array &$newItemIds): void
     {
-        $existingItemIds = $this->api->search('items', ['item_set_id' => $itemSetId], ['returnScalar' => 'id'])->getContent();
-        $newItemIds = $this->api->search('items', $query, ['returnScalar' => 'id'])->getContent();
-
-        /**
-         * Batch update the resources in chunks to fix a memory issue.
-         *
-         * @see \Omeka\Job\BatchUpdate::perform()
-         */
-
-        // Detach all items that are not in new items.
-        $detachItemIds = array_diff($existingItemIds, $newItemIds);
-        if ($detachItemIds) {
-            $i = 0;
-            foreach (array_chunk($detachItemIds, 100) as $idsChunk) {
-                if ($this->shouldStop()) {
-                    return;
-                }
-                $this->api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'remove', 'isPartial' => true]);
-                if (count($detachItemIds) <= 100) {
-                    $this->logger->info(
-                        '{total} items detached from item set #{item_set_id}.', // @translate
-                        ['total' => count($detachItemIds), 'item_set_id' => $itemSetId]
-                    );
-                } else {
-                    $this->logger->info(
-                        '{count}/{total} items detached from item set #{item_set_id}.', // @translate
-                        ['count' => min(++$i * 100, count($detachItemIds)), 'total' => count($detachItemIds), 'item_set_id' => $itemSetId]
-                    );
-                }
-                $this->entityManager->flush();
-                $this->entityManager->clear();
-            }
+        if (!count($newItemIds)) {
+            return;
         }
 
-        // Attach new items only.
-        $newItemIds = $newItemIds ? array_diff($newItemIds, $existingItemIds) : [];
-        if ($newItemIds) {
-            $i = 0;
-            foreach (array_chunk($newItemIds, 100) as $idsChunk) {
-                if ($this->shouldStop()) {
-                    return;
-                }
-                // TODO The use of batchUpdate() may throw exception for recursive loop, so loop items here for now.
-                /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::batchUpdate() */
-                // $this->api->batchUpdate('items', $idsChunk, ['o:item_set' => [$itemSetId]], ['continueOnError' => true, 'collectionAction' => 'append', 'isPartial' => true]);
-                foreach ($idsChunk as $id) {
-                    try {
-                        $item = $this->api->read('items', $id)->getContent();
-                    } catch (\Exception $e) {
-                        continue;
-                    }
-                    $item = json_decode(json_encode($item), true);
-                    // Avoid issues with duplicated item set ids. Normally none.
-                    $itemSetIds = [];
-                    foreach ($item['o:item_set'] ?? [] as $existingItemSet) {
-                        $itemSetIds[$existingItemSet['o:id']] = $existingItemSet['o:id'];
-                    }
-                    if (isset($itemSetIds[$itemSetId])) {
-                        continue;
-                    }
-                    $item['o:item_set'][] = ['o:id' => $itemSetId];
-                    $this->api->update('items', $id, $item, ['continueOnError' => true, 'collectionAction' => 'append', 'isPartial' => true]);
-                }
-                if (count($newItemIds) <= 100) {
-                    $this->logger->info(
-                        '{total} new items attached to item set #{item_set_id}.', // @translate
-                        ['total' => count($newItemIds), 'item_set_id' => $itemSetId]
-                    );
-                } else {
-                    $this->logger->info(
-                        '{count}/{total} new items attached to item set #{item_set_id}.', // @translate
-                        ['count' => min(++$i * 100, count($newItemIds)), 'total' => count($newItemIds), 'item_set_id' => $itemSetId]
-                    );
-                }
-                $this->entityManager->flush();
-                $this->entityManager->clear();
+        // Update new items.
+        $i = 0;
+        foreach (array_chunk($newItemIds, 100) as $ids) {
+            $this->api->batchUpdate('items', $ids, [], ['isPartial' => true, 'continueOnError' => true, 'is_sub_batch' => true]);
+            if (count($newItemIds) <= 100) {
+                $this->logger->info(
+                    '{total} new items attached to item set #{item_set_id}.', // @translate
+                    ['total' => count($newItemIds), 'item_set_id' => $itemSetId]
+                );
+            } else {
+                $this->logger->info(
+                    '{count}/{total} new items attached to item set #{item_set_id}.', // @translate
+                    ['count' => min(++$i * 100, count($newItemIds)), 'total' => count($newItemIds), 'item_set_id' => $itemSetId]
+                );
             }
         }
-
-        $this->logger->info(
-            'Process ended for item set #{item_set_id}: {count} items were attached, {count_2} items were detached, {count_3} new items were attached.', // @translate
-            ['item_set_id' => $itemSetId, 'count' => count($existingItemIds), 'count_2' => count($detachItemIds), 'count_3' => count($newItemIds)]
-        );
     }
 }
