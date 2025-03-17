@@ -61,7 +61,9 @@ When the request is removed, the item set become a static one and existing items
 remain attached.
 
 When it looks like item sets are not indexed, you can reindex them all via a
-task in module [Easy Admin].
+task in module [Easy Admin]. Most of the time, the process without events is
+enough. The events are useful only to reindex items in an external search
+engine, and even in that case, it's better to reindex it separately.
 
 
 TODO
