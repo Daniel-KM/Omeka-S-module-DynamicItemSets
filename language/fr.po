@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-03 00:00+0000\n"
+"POT-Creation-Date: 2025-03-17 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -54,13 +54,13 @@ msgstr ""
 "Les contenus attachés à une collection ne sont plus détachés quand la "
 "requête est supprimée."
 
-#: Module.php:460
+#: Module.php:475
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 "La requête pour attacher les contenus ne peut pas contenir la collection "
 "elle-même."
 
-#: Module.php:490
+#: Module.php:505
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
@@ -70,13 +70,29 @@ msgstr ""
 "plan pour détacher et attacher les contenus ({link_job}tâche #{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: Module.php:577
+#: Module.php:592
 msgid "Query to attach items dynamically to this item set"
 msgstr "Requête pour placer dynamiquement les contenus dans cette collection"
 
-#: Module.php:598
+#: Module.php:614
 msgid "Dynamic item sets: Reindex item sets"
 msgstr "Collections dynamiques : Ré-indexer les collections"
+
+#: Module.php:622
+msgid "Options to reindex dynamic item sets"
+msgstr "Options pour ré-indexer les collections dynamiques"
+
+#: Module.php:633
+msgid "Run events"
+msgstr "Déclencher les événements"
+
+#: Module.php:634
+msgid ""
+"This option is used to reindex external search engine at the same time, but "
+"it is generally simpler to reindex it separately."
+msgstr ""
+"Cette option permet de ré-indexer un moteur externe en même temps, mais il "
+"est généralement plus simple de les ré-indexer séparément."
 
 #: view/common/advanced-search/item-set-is-dynamic.phtml:13
 msgid "Is dynamic item set"
@@ -90,15 +106,15 @@ msgstr "N’est pas dynamique"
 msgid "Any"
 msgstr "Tous"
 
-#: src/Job/AttachItemsToItemSets.php:50
+#: src/Job/AttachItemsToItemSets.php:56
 msgid "No item set to process."
 msgstr "Aucune collection à ré-indexer."
 
-#: src/Job/AttachItemsToItemSets.php:62
+#: src/Job/AttachItemsToItemSets.php:70
 msgid "Processing attach/detach items from {total} item sets."
 msgstr "Traitement des attachements et détachements de {total} collections."
 
-#: src/Job/AttachItemsToItemSets.php:76
+#: src/Job/AttachItemsToItemSets.php:84
 msgid ""
 "The following item sets does not exist or you don’t have the right to manage "
 "them: #{item_set_ids}."
@@ -106,7 +122,7 @@ msgstr ""
 "Les collections suivantes n’existent pas ou vous n’avez pas le droit de les "
 "gérer : #{item_set_ids}."
 
-#: src/Job/AttachItemsToItemSets.php:99
+#: src/Job/AttachItemsToItemSets.php:107
 msgid ""
 "The following item sets have no more query and items attached to it are "
 "kept: #{item_set_ids}."
@@ -114,34 +130,17 @@ msgstr ""
 "Les collections suivantes n’ont plus de requête et les contenus qui y sont "
 "attachés sont conservés : #{item_set_ids}."
 
-#: src/Job/AttachItemsToItemSets.php:108
+#: src/Job/AttachItemsToItemSets.php:116
 msgid "No more item sets to process."
 msgstr "Aucune collection à ré-indexer."
 
-#: src/Job/AttachItemsToItemSets.php:130
-msgid "Processing attach/detach items from {total} item sets ended."
-msgstr ""
-"Traitement terminé pour les attachements et détachements de {total} "
-"collections."
-
 #: src/Job/AttachItemsToItemSets.php:157
-msgid "{total} items detached from item set #{item_set_id}."
-msgstr "{total} contenus détachés de la collection #{item_set_id}."
-
-#: src/Job/AttachItemsToItemSets.php:162
-msgid "{count}/{total} items detached from item set #{item_set_id}."
-msgstr "{count}/{total} contenus détachés de la collection #{item_set_id}."
-
-#: src/Job/AttachItemsToItemSets.php:202
-msgid "{total} new items attached to item set #{item_set_id}."
-msgstr "{total} nouveaux contenus attachés à la collection #{item_set_id}."
-
-#: src/Job/AttachItemsToItemSets.php:207
-msgid "{count}/{total} new items attached to item set #{item_set_id}."
+msgid "Process ended for item set #{item_set_id}: {count} items are attached."
 msgstr ""
-"{count}/{total} nouveaux contenus attachés à la collection #{item_set_id}."
+"Traitement terminé pour la collection #{item_set_id} : {count} contenus ont "
+"été attachés."
 
-#: src/Job/AttachItemsToItemSets.php:217
+#: src/Job/AttachItemsToItemSets.php:175
 msgid ""
 "Process ended for item set #{item_set_id}: {count} items were attached, "
 "{count_2} items were detached, {count_3} new items were attached."
@@ -149,6 +148,27 @@ msgstr ""
 "Traitement terminé pour la collection #{item_set_id} : {count} contenus "
 "étaient attachés, {count_2} contenus ont été détachés, {count_3} nouveaux "
 "contenus ont été attachés."
+
+#: src/Job/AttachItemsToItemSets.php:185
+msgid "Processing attach/detach items from {total} item sets ended."
+msgstr ""
+"Traitement terminé pour les attachements et détachements de {total} "
+"collections."
+
+#: src/Job/AttachItemsToItemSets.php:226
+msgid "{total} new items attached to item set #{item_set_id}."
+msgstr "{total} nouveaux contenus attachés à la collection #{item_set_id}."
+
+#: src/Job/AttachItemsToItemSets.php:231
+msgid "{count}/{total} new items attached to item set #{item_set_id}."
+msgstr ""
+"{count}/{total} nouveaux contenus attachés à la collection #{item_set_id}."
+
+#~ msgid "{total} items detached from item set #{item_set_id}."
+#~ msgstr "{total} contenus détachés de la collection #{item_set_id}."
+
+#~ msgid "{count}/{total} items detached from item set #{item_set_id}."
+#~ msgstr "{count}/{total} contenus détachés de la collection #{item_set_id}."
 
 #~ msgid "Search this value"
 #~ msgstr "Rechercher cette valeur"

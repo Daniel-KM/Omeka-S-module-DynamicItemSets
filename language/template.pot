@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-03 00:00+0000\n"
+"POT-Creation-Date: 2025-03-17 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,23 +48,37 @@ msgid ""
 "removed."
 msgstr ""
 
-#: Module.php:460
+#: Module.php:475
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 
-#: Module.php:490
+#: Module.php:505
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
 "logs{link_end})."
 msgstr ""
 
-#: Module.php:577
+#: Module.php:592
 msgid "Query to attach items dynamically to this item set"
 msgstr ""
 
-#: Module.php:598
+#: Module.php:614
 msgid "Dynamic item sets: Reindex item sets"
+msgstr ""
+
+#: Module.php:622
+msgid "Options to reindex dynamic item sets"
+msgstr ""
+
+#: Module.php:633
+msgid "Run events"
+msgstr ""
+
+#: Module.php:634
+msgid ""
+"This option is used to reindex external search engine at the same time, but "
+"it is generally simpler to reindex it separately."
 msgstr ""
 
 #: view/common/advanced-search/item-set-is-dynamic.phtml:13
@@ -79,52 +93,48 @@ msgstr ""
 msgid "Any"
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:50
+#: src/Job/AttachItemsToItemSets.php:56
 msgid "No item set to process."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:62
+#: src/Job/AttachItemsToItemSets.php:70
 msgid "Processing attach/detach items from {total} item sets."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:76
+#: src/Job/AttachItemsToItemSets.php:84
 msgid ""
 "The following item sets does not exist or you don’t have the right to manage "
 "them: #{item_set_ids}."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:99
+#: src/Job/AttachItemsToItemSets.php:107
 msgid ""
 "The following item sets have no more query and items attached to it are "
 "kept: #{item_set_ids}."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:108
+#: src/Job/AttachItemsToItemSets.php:116
 msgid "No more item sets to process."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:130
-msgid "Processing attach/detach items from {total} item sets ended."
-msgstr ""
-
 #: src/Job/AttachItemsToItemSets.php:157
-msgid "{total} items detached from item set #{item_set_id}."
+msgid "Process ended for item set #{item_set_id}: {count} items are attached."
 msgstr ""
 
-#: src/Job/AttachItemsToItemSets.php:162
-msgid "{count}/{total} items detached from item set #{item_set_id}."
-msgstr ""
-
-#: src/Job/AttachItemsToItemSets.php:202
-msgid "{total} new items attached to item set #{item_set_id}."
-msgstr ""
-
-#: src/Job/AttachItemsToItemSets.php:207
-msgid "{count}/{total} new items attached to item set #{item_set_id}."
-msgstr ""
-
-#: src/Job/AttachItemsToItemSets.php:217
+#: src/Job/AttachItemsToItemSets.php:175
 msgid ""
 "Process ended for item set #{item_set_id}: {count} items were attached, "
 "{count_2} items were detached, {count_3} new items were attached."
+msgstr ""
+
+#: src/Job/AttachItemsToItemSets.php:185
+msgid "Processing attach/detach items from {total} item sets ended."
+msgstr ""
+
+#: src/Job/AttachItemsToItemSets.php:226
+msgid "{total} new items attached to item set #{item_set_id}."
+msgstr ""
+
+#: src/Job/AttachItemsToItemSets.php:231
+msgid "{count}/{total} new items attached to item set #{item_set_id}."
 msgstr ""
