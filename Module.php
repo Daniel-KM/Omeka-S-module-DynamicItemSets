@@ -408,9 +408,20 @@ class Module extends AbstractModule
          * @var \Omeka\Entity\ItemSet|\Omeka\Api\Representation\ItemSetRepresentation $itemSet
          * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
          */
+        $request = $event->getParam('request');
+
+        // Fix issue with double loop or sub-event or reload.
+        $data = $request->getContent();
+        if (!$data
+            // Take care of partial update.
+            || !array_key_exists('item_set_query_items', $data)
+        ) {
+            return;
+        }
+
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
-        $request = $event->getParam('request');
+
         $response = $event->getParam('response');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
@@ -426,7 +437,11 @@ class Module extends AbstractModule
         $query = null;
         $queryString = $request->getValue('item_set_query_items') ?: null;
         if ($queryString) {
-            parse_str($queryString, $query);
+            if (is_array($queryString)) {
+                $query = $queryString;
+            } else {
+                parse_str($queryString, $query);
+            }
         }
 
         // Quick clean for most of the cases.
