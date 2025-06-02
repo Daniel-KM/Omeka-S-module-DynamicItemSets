@@ -13,6 +13,11 @@ return [
             dirname(__DIR__) . '/view',
         ],
     ],
+    'form_elements' => [
+        'invokables' => [
+            Form\Element\ArrayTextareaQueries::class => Form\Element\ArrayTextareaQueries::class,
+        ],
+    ],
     'column_types' => [
         'invokables' => [
             'is_dynamic' => ColumnType\IsDynamic::class,
