@@ -7,8 +7,10 @@ Dynamic Item Sets (module for Omeka S)
 
 Voir le [Lisez-moi] en français.
 
-[Dynamic Item Sets] is a module for [Omeka S] that allows to attach
-automatically items to item sets via a standard query..
+[Dynamic Item Sets] is a module for [Omeka S] that allows to include items in
+item sets automatically via a standard query, via two ways, so the items will be
+removed (dynamic item sets) or not (static item sets filled dynamically) from
+the item sets if their metadata does not match any more.
 
 For example, it is possible to create an item set bringing together all the
 items with blue color, or all items with type Audio or all items of the 14th
@@ -39,6 +41,8 @@ The module [Easy Admin] can be installed to run a reindexation of all item sets.
 Usage
 -----
 
+### Dynamic item sets
+
 To make an item set dynamic, simply define the query that will define its items
 via the field in the Advanced tab of item set edition.
 
@@ -47,14 +51,14 @@ new items will be automatically attached to this item set, according to the
 request.
 
 Warning: items that are manually attached to the item set will be automatically
-detached if they are not in the results of the request.
+detached if they are no more in the results of the request.
 
 There is no difference between dynamic item sets and others. So, it may be
 useful to use a specific resource model or to add a property with a boolean
 (module [Data Type Rdf]) to identify and to use them more easily.
 
-Dynamic item sets can be identified via the advanced search with the "Is dynamic"
-radio button or by adding `is_dynamic=1` in the url (https://example.org/admin/item-set?is_dynamic=1)
+Anyway, dynamic item sets can be identified via the advanced search with the
+"Is dynamic" radio button or by adding `is_dynamic=1` in the url (https://example.org/admin/item-set?is_dynamic=1)
 or exclude them with `is_dynamic=0`.
 
 When the request is removed, the item set become a static one and existing items
@@ -64,6 +68,14 @@ When it looks like item sets are not indexed, you can reindex them all via a
 task in module [Easy Admin]. Most of the time, the process without events is
 enough. The events are useful only to reindex items in an external search
 engine, and even in that case, it's better to reindex it separately.
+
+### Static item sets filled automatically
+
+In main settings, an option allows to define a list of item sets in which an
+item will be included when its metadata will match the query.
+
+Unlike dynamic item sets, the item is never removed automatically from these
+item sets, that remains standard ones.
 
 
 TODO
