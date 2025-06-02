@@ -11,8 +11,8 @@ class DynamicItemSetQuery extends AbstractHelper
     /**
      * Check if an item set is dynamic an returns its query as array.
      *
-     * @param \Omeka\Api\Representation\ItemSetRepresentation|`int
-     * @return array`null
+     * @param \Omeka\Api\Representation\ItemSetRepresentation|int
+     * @return array|null
      */
     public function __invoke($itemSetOrId): ?array
     {

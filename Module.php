@@ -2,7 +2,7 @@
 
 namespace DynamicItemSets;
 
-if (!class_exists(\Common\TraitModule::class)) {
+if (!class_exists('Common\TraitModule', false)) {
     require_once dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
@@ -573,13 +573,9 @@ class Module extends AbstractModule
                 ),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
-                'link_log' => sprintf(
-                    '<a href="%s">',
-                    // Check if module Log is enabled (avoid issue when disabled).
-                    htmlspecialchars(class_exists('Log\Module', false)
-                        ? $urlHelper('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
-                        : $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log'])
-                    )),
+                'link_log' => class_exists('Log\Module', false)
+                    ? sprintf('<a href="%1$s">', $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
+                    : sprintf('<a href="%1$s" target="_blank">', $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
             ]
         );
         $message->setEscapeHtml(false);
@@ -781,7 +777,7 @@ class Module extends AbstractModule
             if (is_array($value)) {
                 $array[$key] = $this->arrayFilterRecursiveEmpty($value);
             }
-            if ($array[$key] === '' || $array[$key] === [] || $array[$key] === null) {
+            if (in_array($array[$key], ['', null, []], true)) {
                 unset($array[$key]);
             }
         }
