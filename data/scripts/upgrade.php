@@ -41,6 +41,7 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
 
+// Check for incompatibility.
 if ($this->isModuleActive('AdvancedResourceTemplate')
     && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
 ) {
@@ -51,11 +52,12 @@ if ($this->isModuleActive('AdvancedResourceTemplate')
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
 
-if (version_compare($oldVersion, '3.4.35', '<')) {
-    // Clean queries.
+if (version_compare($oldVersion, '3.4.5', '<')) {
+    // Clean and rename queries.
     $queries = $settings->get('dynamicitemsets_item_set_queries', []);
     if ($queries) {
         foreach ($queries as $key => $query) {
+            $query = $this->removeArgumentsPageAndSort($query);
             $this->arrayFilterRecursiveEmpty($query);
             $query = $query ?: null;
             if (!$query) {
@@ -66,10 +68,16 @@ if (version_compare($oldVersion, '3.4.35', '<')) {
         }
     }
     ksort($queries);
-    $settings->set('dynamicitemsets_item_set_queries', $queries);
+    $settings->set('dynamicitemsets_item_sets_queries_dynamic', $queries);
+    $settings->delete('dynamicitemsets_item_set_queries');
 
     $message = new PsrMessage(
         'The attached items to an item set are no more detached when the query is removed.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new setting allows to set static item sets filled dynamically. When an item is saved, it will be included in item sets matching queries. Unlike dynamic item sets, an item won’t be removed from an item set automatically when the metadata does not match a query any more.' // @translate
     );
     $messenger->addSuccess($message);
 }
