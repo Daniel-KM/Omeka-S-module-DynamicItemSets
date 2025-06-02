@@ -10,7 +10,6 @@ use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
-use Omeka\Api\Representation\ItemRepresentation;
 use Omeka\Api\Representation\ItemSetRepresentation;
 use Omeka\Entity\Item;
 use Omeka\Module\AbstractModule;
@@ -320,10 +319,10 @@ class Module extends AbstractModule
     }
 
     /**
-     * Append item to items sets according to each request.
+     * Append/remove item to/from items sets according to each query.
      *
      * A post event is required else the search query cannot be done.
-     * Else process differently for "add".
+     * Else process differently when creating a new item ("add").
      */
     public function handleApiSavePostItem(Event $event): void
     {
@@ -353,25 +352,48 @@ class Module extends AbstractModule
 
         $itemId = $item->getId();
 
+        $existingItemSetIds = [];
+        foreach ($item->getItemSets() as $itemSet) {
+            $existingItemSetIds[$itemSet->getId()] = $itemSet->getId();
+        }
+
         $newItemSetIds = [];
+        $removedItemSetIds = [];
 
         $queries = $this->updateItemSetsQueriesDynamic();
         if ($queries) {
-            $newItemSetIds = $this->listNewItemSetsForItem($item, $queries);
+            // Don't check for existing item sets, it is useless.
+            // It may avoid an infinite loop too.
+            $checkQueries = array_diff_key($queries, $existingItemSetIds);
+            $newItemSetIds = $this->listMatchingItemSetsForItem($itemId, $checkQueries);
+            // Get the list of removed item sets.
+            // TODO Check if there can be an infinite loop here.
+            $checkQueries = array_diff_key(array_intersect_key($queries, $existingItemSetIds), $newItemSetIds);
+            $matchingItemSets = $this->listMatchingItemSetsForItem($itemId, $checkQueries);
+            $removedItemSetIds = array_intersect_key($existingItemSetIds, array_diff_key($checkQueries, $matchingItemSets));
         }
 
         $queries = $this->updateItemSetsQueriesStatic();
         if ($queries) {
-            $newItemSetIds = array_merge($newItemSetIds, $this->listNewItemSetsForItem($item, $queries));
+            // Don't check for existing item sets and new item sets, it is useless.
+            // It may avoid an infinite loop too.
+            $checkQueries = array_diff_key($queries, $existingItemSetIds, $newItemSetIds);
+            $matchingItemSets = $this->listMatchingItemSetsForItem($itemId, $checkQueries);
+            $newItemSetIds = array_unique(array_replace($newItemSetIds, $matchingItemSets));
+            // Do not remove item sets that should be added.
+            $removedItemSetIds = array_diff_key($removedItemSetIds, $newItemSetIds);
         }
 
-        $newItemSetIds = array_unique($newItemSetIds);
-
-        if (!$newItemSetIds) {
+        if (!count($newItemSetIds) && !count($removedItemSetIds)) {
             return;
         }
 
-        $newItem = $this->updateItemWithItemSets($itemId, $newItemSetIds);
+        // Prepare the new list of item sets.
+        $replacedItemSetIds = array_diff_key(array_unique($existingItemSetIds + $newItemSetIds), $removedItemSetIds);
+
+        $flushEntityManager = (bool) $request->getOption('flushEntityManager', true);
+
+        $newItem = $this->replaceItemSetsForItem($itemId, $replacedItemSetIds, $flushEntityManager);
 
         // Set right content in response.
         $responseContent = $request->getOption('responseContent');
@@ -385,51 +407,39 @@ class Module extends AbstractModule
     }
 
     /**
-     * Get list of new item sets of an item according to a list of queries.
+     * Get list of matching item sets of an item according to a list of queries.
      *
-     * @return array List of new item sets.
+     * @return array List of matching item sets as key/value.
      */
-    protected function listNewItemSetsForItem(Item $item, array $queries): array
+    protected function listMatchingItemSetsForItem(int $itemId, array $queries): array
     {
-        $existingItemSetIds = [];
-        foreach ($item->getItemSets() as $itemSet) {
-            $existingItemSetIds[$itemSet->getId()] = $itemSet->getId();
-        }
-
-        // Don't check for existing item sets.
-        // It may avoid an infinite loop too.
-        $queries = array_diff_key($queries, $existingItemSetIds);
-        if (!$queries) {
-            return [];
-        }
-
         // The adapter cannot be used directly when module AdvancedSearch is
         // enabled, because some arguments are not supported.
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
 
-        $itemId = $item->getId();
-
         // Check if the item belongs to each item set.
-        $newItemSetIds = [];
+        $matchingItemSetIds = [];
         foreach ($queries as $itemSetId => $query) {
             $query = $this->removeArgumentsPageAndSort($query);
             $query['id'] = [$itemId];
             $total = $api->search('items', $query + ['limit' => 0])->getTotalResults();
             if ($total) {
-                $newItemSetIds[$itemSetId] = $itemSetId;
+                $matchingItemSetIds[$itemSetId] = $itemSetId;
             }
         }
 
-        return $newItemSetIds;
+        return $matchingItemSetIds;
     }
 
     /**
      * Update item with new item sets.
      */
-    protected function updateItemWithItemSets(int $itemId, array $itemSetIds): ItemRepresentation
+    protected function replaceItemSetsForItem(int $itemId, array $itemSetIds, bool $flushEntityManager): Item
     {
         // In a post event, an infinite loop should be avoided, so skip api.
+
+        $adapter = $this->getServiceLocator()->get('Omeka\ApiAdapterManager')->get('items');
 
         $data = [
             'o:item_set' => array_values($itemSetIds),
@@ -441,9 +451,10 @@ class Module extends AbstractModule
             ->setOption('initialize', false)
             ->setOption('finalize', false)
             ->setOption('isPartial', true)
-            ->setOption('collectionAction', 'append')
+            // Replace is the default value for collectionAction.
+            ->setOption('collectionAction', 'replace')
             // Manage single and batch update processes.
-            ->setOption('flushEntityManager', (bool) $request->getOption('flushEntityManager', true))
+            ->setOption('flushEntityManager', $flushEntityManager)
             ->setContent($data);
         $newItem = $adapter->update($updateRequest)->getContent();
 
