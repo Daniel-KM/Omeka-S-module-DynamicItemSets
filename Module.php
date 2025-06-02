@@ -68,6 +68,7 @@ class Module extends AbstractModule
 
         $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []) ?: [];
         foreach ($itemSetQueries as $key => $query) {
+            $query = $this->removeArgumentsPageAndSort($query);
             $this->arrayFilterRecursiveEmpty($query);
             if ($query) {
                 $itemSetQueries[$key] = $query;
@@ -359,9 +360,10 @@ class Module extends AbstractModule
         // Check if the item belongs to each item set.
         $newItemSetIds = [];
         foreach ($queries as $itemSetId => $query) {
+            $query = $this->removeArgumentsPageAndSort($query);
             $query['id'] = [$itemId];
-            $result = $api->search('items', $query, ['returnScalar' => 'id'])->getTotalResults();
-            if ($result) {
+            $total = $api->search('items', $query + ['limit' => 0])->getTotalResults();
+            if ($total) {
                 $newItemSetIds[$itemSetId] = $itemSetId;
             }
         }
@@ -446,6 +448,7 @@ class Module extends AbstractModule
 
         // Quick clean for most of the cases.
         if ($query) {
+            $query = $this->removeArgumentsPageAndSort($query);
             $this->arrayFilterRecursiveEmpty($query);
         }
 
@@ -650,6 +653,29 @@ class Module extends AbstractModule
                 'direct' => empty($params['module_tasks']['dynis_reindex_settings']['via_api']),
             ]);
         }
+    }
+
+    /**
+     * Remove arguments page and sort.
+     */
+    protected function removeArgumentsPageAndSort(array $query): array
+    {
+        unset(
+            $query['page'],
+            $query['per_page'],
+            $query['offset'],
+            $query['limit'],
+            $query['sort_by'],
+            $query['sort_order'],
+            $query['sort_by_default'],
+            $query['sort_order_default'],
+            $query['submit'],
+            // Not for standard search, but common.
+            $query['sort'],
+            $query['order'],
+            $query['order_by']
+        );
+        return $query;
     }
 
     /**
