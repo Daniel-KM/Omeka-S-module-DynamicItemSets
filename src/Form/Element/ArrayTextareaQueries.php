@@ -9,11 +9,19 @@ class ArrayTextareaQueries extends ArrayTextarea
     /**
      * @var bool
      */
+    protected $removeArgumentsPageAndSort = false;
+
+    /**
+     * @var bool
+     */
     protected $removeArgumentsUseless = false;
 
     public function setOptions($options)
     {
         parent::setOptions($options);
+        if (array_key_exists('remove_arguments_page_and_sort', $this->options)) {
+            $this->setRemoveArgumentsPageAndSort($this->options['remove_arguments_page_and_sort']);
+        }
         if (array_key_exists('remove_arguments_useless', $this->options)) {
             $this->setRemoveArgumentsUseless($this->options['remove_arguments_useless']);
         }
@@ -75,6 +83,9 @@ class ArrayTextareaQueries extends ArrayTextarea
                 [$key, $value] = array_map('trim', explode($this->keyValueSeparator, $keyValue, 2));
                 $query = [];
                 parse_str(ltrim((string) $value, "? \t\n\r\0\x0B"), $query);
+                if ($this->removeArgumentsPageAndSort) {
+                    $query = $this->removeArgumentsPageAndSort($query);
+                }
                 if ($this->removeArgumentsUseless) {
                     $query = $this->arrayFilterRecursiveEmpty($query);
                 }
@@ -90,12 +101,38 @@ class ArrayTextareaQueries extends ArrayTextarea
         foreach ($strings as $key => $string) {
             $query = [];
             parse_str(ltrim((string) $string, "? \t\n\r\0\x0B"), $query);
+            if ($this->removeArgumentsPageAndSort) {
+                $query = $this->removeArgumentsPageAndSort($query);
+            }
             if ($this->removeArgumentsUseless) {
                 $query = $this->arrayFilterRecursiveEmpty($query);
             }
             $strings[$key] = $query;
         }
         return $strings;
+    }
+
+    /**
+     * Remove arguments page and sort.
+     */
+    public function removeArgumentsPageAndSort(array $query): array
+    {
+        unset(
+            $query['page'],
+            $query['per_page'],
+            $query['offset'],
+            $query['limit'],
+            $query['sort_by'],
+            $query['sort_order'],
+            $query['sort_by_default'],
+            $query['sort_order_default'],
+            $query['submit'],
+            // Not for standard search, but common.
+            $query['sort'],
+            $query['order'],
+            $query['order_by']
+        );
+        return $query;
     }
 
     /**
@@ -118,6 +155,17 @@ class ArrayTextareaQueries extends ArrayTextarea
             }
         }
         return $array;
+    }
+
+    public function setRemoveArgumentsPageAndSort($removeArgumentsPageAndSort): self
+    {
+        $this->removeArgumentsPageAndSort = (bool) $removeArgumentsPageAndSort;
+        return $this;
+    }
+
+    public function getRemoveArgumentsPageAndSort(): bool
+    {
+        return $this->removeArgumentsPageAndSort;
     }
 
     public function setRemoveArgumentsUseless($removeArgumentsUseless): self
