@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 00:00+0000\n"
+"POT-Creation-Date: 2025-06-02 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:38 Module.php:42
+#: data/scripts/upgrade.php:38 Module.php:44
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:48
+#: data/scripts/upgrade.php:49
 msgid ""
 "To avoid compatibility issue, the module {module} should be version "
 "{version} or greater."
 msgstr ""
 
-#: Module.php:53
+#: Module.php:55
 msgid ""
 "When present, the module requires module {module} version {version} or "
 "greater."
 msgstr ""
 
-#: Module.php:246 Module.php:285
+#: Module.php:262 Module.php:301
 msgid "Is dynamic"
 msgstr ""
 
@@ -42,40 +42,50 @@ msgstr ""
 msgid "Search dynamic item sets"
 msgstr ""
 
-#: data/scripts/upgrade.php:72
+#: data/scripts/upgrade.php:75
 msgid ""
 "The attached items to an item set are no more detached when the query is "
 "removed."
 msgstr ""
 
-#: Module.php:475
+#: data/scripts/upgrade.php:80
+msgid ""
+"A new setting allows to set static item sets filled dynamically. When an "
+"item is saved, it will be included in item sets matching queries. Unlike "
+"dynamic item sets, an item won’t be removed from an item set automatically "
+"when the metadata does not match a query any more."
+msgstr ""
+
+#: Module.php:534
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 
-#: Module.php:505
+#: Module.php:564
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
 "logs{link_end})."
 msgstr ""
 
-#: Module.php:592
-msgid "Query to attach items dynamically to this item set"
+#: Module.php:675
+msgid ""
+"Query to make this item set dynamic in order to include and to exclude items "
+"automatically"
 msgstr ""
 
-#: Module.php:614
+#: Module.php:697
 msgid "Dynamic item sets: Reindex item sets"
 msgstr ""
 
-#: Module.php:622
+#: Module.php:705
 msgid "Options to reindex dynamic item sets"
 msgstr ""
 
-#: Module.php:633
+#: Module.php:716
 msgid "Run events"
 msgstr ""
 
-#: Module.php:634
+#: Module.php:717
 msgid ""
 "This option is used to reindex external search engine at the same time, but "
 "it is generally simpler to reindex it separately."
@@ -137,4 +147,21 @@ msgstr ""
 
 #: src/Job/AttachItemsToItemSets.php:231
 msgid "{count}/{total} new items attached to item set #{item_set_id}."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:10 src/Form/SettingsFieldset.php:13
+msgid "Dynamic item sets"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:27
+msgid "Static item sets filled dynamically"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:28
+msgid ""
+"When an item is saved, it will be included in item sets matching queries, "
+"separated with a \"=\". Queries are standard Omeka searches. Unlike dynamic "
+"item sets, an item won’t be removed from an item set automatically when the "
+"metadata does not match a query any more. Dynamic item sets should not be "
+"set here."
 msgstr ""

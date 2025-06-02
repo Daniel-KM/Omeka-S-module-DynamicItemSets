@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 00:00+0000\n"
+"POT-Creation-Date: 2025-06-02 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: data/scripts/upgrade.php:38 Module.php:42
+#: data/scripts/upgrade.php:38 Module.php:44
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: data/scripts/upgrade.php:48
+#: data/scripts/upgrade.php:49
 msgid ""
 "To avoid compatibility issue, the module {module} should be version "
 "{version} or greater."
@@ -30,7 +30,7 @@ msgstr ""
 "Pour éviter des problèmes de compatibilités, le module {module} doit mis à "
 "niveau à la version {version} ou supérieure."
 
-#: Module.php:53
+#: Module.php:55
 msgid ""
 "When present, the module requires module {module} version {version} or "
 "greater."
@@ -38,7 +38,7 @@ msgstr ""
 "Lorsqu’il est présent, le module nécessite que le module {module} soit mis à "
 "niveau à la version {version} ou supérieure."
 
-#: Module.php:246 Module.php:285
+#: Module.php:262 Module.php:301
 msgid "Is dynamic"
 msgstr "Est dynamique"
 
@@ -46,7 +46,7 @@ msgstr "Est dynamique"
 msgid "Search dynamic item sets"
 msgstr "Rechercher les collections dynamiques"
 
-#: data/scripts/upgrade.php:72
+#: data/scripts/upgrade.php:75
 msgid ""
 "The attached items to an item set are no more detached when the query is "
 "removed."
@@ -54,13 +54,26 @@ msgstr ""
 "Les contenus attachés à une collection ne sont plus détachés quand la "
 "requête est supprimée."
 
-#: Module.php:475
+#: data/scripts/upgrade.php:80
+msgid ""
+"A new setting allows to set static item sets filled dynamically. When an "
+"item is saved, it will be included in item sets matching queries. Unlike "
+"dynamic item sets, an item won’t be removed from an item set automatically "
+"when the metadata does not match a query any more."
+msgstr ""
+"Un nouveau paramètre permet de remplir des collections statiques "
+"dynamiquement. Quand un contenu est enregistré, il sera inclus dans les "
+"collections correspondant aux requêtes. Contrairement aux collections "
+"dynamiques, un contenu ne sera pas retiré d’une collection automatiquement "
+"quand ses métadonnées ne correspondent plus à la requête."
+
+#: Module.php:534
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 "La requête pour attacher les contenus ne peut pas contenir la collection "
 "elle-même."
 
-#: Module.php:505
+#: Module.php:564
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
@@ -70,23 +83,27 @@ msgstr ""
 "plan pour détacher et attacher les contenus ({link_job}tâche #{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: Module.php:592
-msgid "Query to attach items dynamically to this item set"
-msgstr "Requête pour placer dynamiquement les contenus dans cette collection"
+#: Module.php:675
+msgid ""
+"Query to make this item set dynamic in order to include and to exclude items "
+"automatically"
+msgstr ""
+"Requête pour rendre la collection dynamique afin d’inclure ou exclure les "
+"contenus automatiquement"
 
-#: Module.php:614
+#: Module.php:697
 msgid "Dynamic item sets: Reindex item sets"
 msgstr "Collections dynamiques : Ré-indexer les collections"
 
-#: Module.php:622
+#: Module.php:705
 msgid "Options to reindex dynamic item sets"
 msgstr "Options pour ré-indexer les collections dynamiques"
 
-#: Module.php:633
+#: Module.php:716
 msgid "Run events"
 msgstr "Déclencher les événements"
 
-#: Module.php:634
+#: Module.php:717
 msgid ""
 "This option is used to reindex external search engine at the same time, but "
 "it is generally simpler to reindex it separately."
@@ -163,6 +180,33 @@ msgstr "{total} nouveaux contenus attachés à la collection #{item_set_id}."
 msgid "{count}/{total} new items attached to item set #{item_set_id}."
 msgstr ""
 "{count}/{total} nouveaux contenus attachés à la collection #{item_set_id}."
+
+#: src/Form/SettingsFieldset.php:10 src/Form/SettingsFieldset.php:13
+msgid "Dynamic item sets"
+msgstr "Collections dynamiques"
+
+#: src/Form/SettingsFieldset.php:27
+msgid "Static item sets filled dynamically"
+msgstr "Collections statiques remplies dynamiquement"
+
+#: src/Form/SettingsFieldset.php:28
+msgid ""
+"When an item is saved, it will be included in item sets matching queries, "
+"separated with a \"=\". Queries are standard Omeka searches. Unlike dynamic "
+"item sets, an item won’t be removed from an item set automatically when the "
+"metadata does not match a query any more. Dynamic item sets should not be "
+"set here."
+msgstr ""
+"Quand un contenu est enregistré, il sera inclus dans les collections "
+"correspondant aux requêtes, séparées par un « = ». Les requêtes sont des "
+"recherches standard Omeka. Contrairement aux collections dynamiques, le "
+"contenu ne sera pas retiré de la collection automatiquement quand ses "
+"métadonnées ne correspondront plus à la requête. Les collections dynamiques "
+"ne doivent pas être définies ici."
+
+#~ msgid "Query to attach items dynamically to this item set"
+#~ msgstr ""
+#~ "Requête pour placer dynamiquement les contenus dans cette collection"
 
 #~ msgid "{total} items detached from item set #{item_set_id}."
 #~ msgstr "{total} contenus détachés de la collection #{item_set_id}."
