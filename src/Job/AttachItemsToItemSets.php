@@ -60,7 +60,7 @@ class AttachItemsToItemSets extends AbstractJob
         $useDirectSql = (bool) $this->getArg('direct');
 
         $settings = $services->get('Omeka\Settings');
-        $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
+        $queries = $settings->get('dynamicitemsets_item_sets_queries_dynamic') ?: [];
 
         if ($itemSetIds === null) {
             $itemSetIds = array_keys($queries);

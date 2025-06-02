@@ -60,24 +60,28 @@ class Module extends AbstractModule
     protected function postInstall(): void
     {
         // Whatever the version of AdvancedResourceTemplate, get its metadata.
-        $settings = $this->getServiceLocator()->get('Omeka\Settings');
-        $currents = $settings->get('dynamicitemsets_item_set_queries');
-        if (!empty($currents)) {
-            return;
-        }
+        // The name of the key was updated, but manage old name.
 
-        $itemSetQueries = $settings->get('advancedresourcetemplate_item_set_queries', []) ?: [];
-        foreach ($itemSetQueries as $key => $query) {
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+
+        $currents = $settings->get('dynamicitemsets_item_sets_queries_dynamic')
+            ?: $settings->get('dynamicitemsets_item_set_queries')
+            ?: $settings->get('advancedresourcetemplate_item_set_queries', [])
+            ?: [];
+        foreach ($currents as $key => $query) {
             $query = $this->removeArgumentsPageAndSort($query);
             $this->arrayFilterRecursiveEmpty($query);
             if ($query) {
-                $itemSetQueries[$key] = $query;
+                $currents[$key] = $query;
             } else {
-                unset($itemSetQueries[$key]);
+                unset($currents[$key]);
             }
         }
-        ksort($itemSetQueries);
-        $settings->set('dynamicitemsets_item_set_queries', $itemSetQueries);
+        ksort($currents);
+        $settings->set('dynamicitemsets_item_sets_queries_dynamic', $currents);
+
+        $settings->delete('dynamicitemsets_item_set_queries');
+        $settings->delete('advancedresourcetemplate_item_set_queries');
 
         // Set it by default in admin for module Advanced Search.
         $selectedSearchFields = $settings->get('advancedsearch_search_fields');
@@ -201,7 +205,7 @@ class Module extends AbstractModule
         $expr = $qb->expr();
 
         $isDynamic = (bool) $query['is_dynamic'];
-        $itemSetQueries = $settings->get('dynamicitemsets_item_set_queries', []);
+        $itemSetQueries = $settings->get('dynamicitemsets_item_sets_queries_dynamic', []);
 
         if (!$itemSetQueries) {
             if ($isDynamic) {
@@ -489,7 +493,7 @@ class Module extends AbstractModule
         }
 
         ksort($queries);
-        $settings->set('dynamicitemsets_item_set_queries', $queries);
+        $settings->set('dynamicitemsets_item_sets_queries_dynamic', $queries);
 
         if (!$query || $query === $existingQuery) {
             return;
@@ -554,7 +558,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
-        $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
+        $queries = $settings->get('dynamicitemsets_item_sets_queries_dynamic') ?: [];
         if ($queries) {
             // Use connection because the current user may not have access to all
             // item sets. Check all item sets one time.
@@ -568,7 +572,7 @@ class Module extends AbstractModule
                 ->fetchAllKeyValue();
             $queries = array_intersect_key($queries, $itemSetIds);
             ksort($queries);
-            $settings->set('dynamicitemsets_item_set_queries', $queries);
+            $settings->set('dynamicitemsets_item_sets_queries_dynamic', $queries);
         }
 
         return $queries;
@@ -582,7 +586,7 @@ class Module extends AbstractModule
 
         /** @var \Omeka\Settings\Settings $settings */
         $settings = $services->get('Omeka\Settings');
-        $queries = $settings->get('dynamicitemsets_item_set_queries') ?: [];
+        $queries = $settings->get('dynamicitemsets_item_sets_queries_dynamic') ?: [];
         $query = $resource ? $queries[$resource->id()] ?? null : null;
 
         $query = $query ? http_build_query($query, '', '&', PHP_QUERY_RFC3986) : null;

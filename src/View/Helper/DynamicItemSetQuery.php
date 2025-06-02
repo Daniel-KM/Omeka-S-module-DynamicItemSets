@@ -26,7 +26,7 @@ class DynamicItemSetQuery extends AbstractHelper
             return null;
         }
 
-        $itemSetQueries = $this->getView()->setting('dynamicitemsets_item_set_queries', []);
+        $itemSetQueries = $this->getView()->setting('dynamicitemsets_item_sets_queries_dynamic', []);
         return empty($itemSetQueries[$itemSetId])
             ? null
             : $itemSetQueries[$itemSetId];
