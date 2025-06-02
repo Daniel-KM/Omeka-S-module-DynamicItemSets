@@ -16,6 +16,7 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\ArrayTextareaQueries::class => Form\Element\ArrayTextareaQueries::class,
+            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
     ],
     'column_types' => [
@@ -37,6 +38,9 @@ return [
         'config' => [
             // Hidden settings.
             'dynamicitemsets_item_sets_queries_dynamic' => [],
+        ],
+        'settings' => [
+            'dynamicitemsets_item_sets_queries_static' => [],
         ],
     ],
 ];

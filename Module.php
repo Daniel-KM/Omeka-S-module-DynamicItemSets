@@ -10,7 +10,9 @@ use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Omeka\Api\Representation\ItemRepresentation;
 use Omeka\Api\Representation\ItemSetRepresentation;
+use Omeka\Entity\Item;
 use Omeka\Module\AbstractModule;
 
 /**
@@ -135,6 +137,8 @@ class Module extends AbstractModule
             'api.search.query',
             [$this, 'searchDynamicItemSets']
         );
+
+        // Indicate if the item set is dynamic or not.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
             'view.advanced_search',
@@ -166,6 +170,13 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\ItemSet',
             'view.edit.form.advanced',
             [$this, 'addAdvancedTabElements']
+        );
+
+        // Handle main settings.
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_elements',
+            [$this, 'handleMainSettings']
         );
 
         // Add a job to update item sets.
@@ -316,11 +327,6 @@ class Module extends AbstractModule
      */
     public function handleApiSavePostItem(Event $event): void
     {
-        $queries = $this->updateItemSetsQueries();
-        if (!$queries) {
-            return;
-        }
-
         /**
          * @var \Omeka\Api\Manager $api
          * @var \Omeka\Api\Request $request
@@ -338,13 +344,53 @@ class Module extends AbstractModule
 
         $item = $response->getContent();
 
-        if ($item instanceof \Omeka\Api\Representation\ItemRepresentation) {
+        if ($item instanceof \Omeka\Api\Representation\ItemRepresentation
+            || $item instanceof \Omeka\Api\Representation\ResourceReference
+        ) {
             /** @var \Omeka\Entity\Item $item */
             $item = $adapter->getEntityManager()->find(\Omeka\Entity\Item::class, $item->id());
         }
 
         $itemId = $item->getId();
 
+        $newItemSetIds = [];
+
+        $queries = $this->updateItemSetsQueriesDynamic();
+        if ($queries) {
+            $newItemSetIds = $this->listNewItemSetsForItem($item, $queries);
+        }
+
+        $queries = $this->updateItemSetsQueriesStatic();
+        if ($queries) {
+            $newItemSetIds = array_merge($newItemSetIds, $this->listNewItemSetsForItem($item, $queries));
+        }
+
+        $newItemSetIds = array_unique($newItemSetIds);
+
+        if (!$newItemSetIds) {
+            return;
+        }
+
+        $newItem = $this->updateItemWithItemSets($itemId, $newItemSetIds);
+
+        // Set right content in response.
+        $responseContent = $request->getOption('responseContent');
+        if ($responseContent === 'representation') {
+            $newItem = $adapter->getRepresentation($newItem);
+        } elseif ($responseContent === 'reference') {
+            $newItem = $adapter->getRepresentation($newItem)->getReference();
+        }
+
+        $response->setContent($newItem);
+    }
+
+    /**
+     * Get list of new item sets of an item according to a list of queries.
+     *
+     * @return array List of new item sets.
+     */
+    protected function listNewItemSetsForItem(Item $item, array $queries): array
+    {
         $existingItemSetIds = [];
         foreach ($item->getItemSets() as $itemSet) {
             $existingItemSetIds[$itemSet->getId()] = $itemSet->getId();
@@ -354,12 +400,15 @@ class Module extends AbstractModule
         // It may avoid an infinite loop too.
         $queries = array_diff_key($queries, $existingItemSetIds);
         if (!$queries) {
-            return;
+            return [];
         }
 
         // The adapter cannot be used directly when module AdvancedSearch is
         // enabled, because some arguments are not supported.
+        $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
+
+        $itemId = $item->getId();
 
         // Check if the item belongs to each item set.
         $newItemSetIds = [];
@@ -372,14 +421,18 @@ class Module extends AbstractModule
             }
         }
 
-        if (!$newItemSetIds) {
-            return;
-        }
+        return $newItemSetIds;
+    }
 
+    /**
+     * Update item with new item sets.
+     */
+    protected function updateItemWithItemSets(int $itemId, array $itemSetIds): ItemRepresentation
+    {
         // In a post event, an infinite loop should be avoided, so skip api.
 
         $data = [
-            'o:item_set' => $newItemSetIds,
+            'o:item_set' => array_values($itemSetIds),
         ];
 
         $updateRequest = new \Omeka\Api\Request('update', 'items');
@@ -394,15 +447,7 @@ class Module extends AbstractModule
             ->setContent($data);
         $newItem = $adapter->update($updateRequest)->getContent();
 
-        // Set right content in response.
-        $responseContent = $request->getOption('responseContent');
-        if ($responseContent === 'representation') {
-            $newItem = $adapter->getRepresentation($newItem);
-        } elseif ($responseContent === 'reference') {
-            $newItem = $adapter->getRepresentation($newItem)->getReference();
-        }
-
-        $response->setContent($newItem);
+        return $newItem;
     }
 
     public function handleApiSavePostItemSet(Event $event): void
@@ -434,7 +479,7 @@ class Module extends AbstractModule
         $itemSet = $response->getContent();
         $itemSetId = method_exists($itemSet, 'getId') ? $itemSet->getId() : $itemSet->id();
 
-        $queries = $this->updateItemSetsQueries();
+        $queries = $this->updateItemSetsQueriesDynamic();
 
         $existingQuery = $queries[$itemSetId] ?? null;
 
@@ -535,15 +580,16 @@ class Module extends AbstractModule
      */
     public function handleApiDeletePostItemSet(Event $event): void
     {
-        $this->updateItemSetsQueries();
+        $this->updateItemSetsQueriesDynamic();
+        $this->updateItemSetsQueriesStatic();
     }
 
     /**
-     * Update list of all item sets.
+     * Update list of all dynamic item sets.
      *
      * @return array List of queries.
      */
-    protected function updateItemSetsQueries(): array
+    protected function updateItemSetsQueriesDynamic(): array
     {
         static $queries;
 
@@ -551,6 +597,31 @@ class Module extends AbstractModule
             return $queries;
         }
 
+        // For key "dynamicitemsets_item_sets_queries_dynamic".
+        $queries = $this->updateItemSetsQueries('dynamic');
+        return $queries;
+    }
+
+    /**
+     * Update list of all static item sets filled dynamically.
+     *
+     * @return array List of queries.
+     */
+    protected function updateItemSetsQueriesStatic(): array
+    {
+        static $queries;
+
+        if ($this->isBatchUpdate && $queries !== null) {
+            return $queries;
+        }
+
+        // For key "dynamicitemsets_item_sets_queries_static".
+        $queries = $this->updateItemSetsQueries('static');
+        return $queries;
+    }
+
+    protected function updateItemSetsQueries(string $type): array
+    {
         /**
          * @var \Omeka\Settings\Settings $settings
          * @var \Doctrine\DBAL\Connection $connection
@@ -558,7 +629,9 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
-        $queries = $settings->get('dynamicitemsets_item_sets_queries_dynamic') ?: [];
+        $settingName = "dynamicitemsets_item_sets_queries_$type";
+
+        $queries = $settings->get($settingName) ?: [];
         if ($queries) {
             // Use connection because the current user may not have access to all
             // item sets. Check all item sets one time.
@@ -572,7 +645,7 @@ class Module extends AbstractModule
                 ->fetchAllKeyValue();
             $queries = array_intersect_key($queries, $itemSetIds);
             ksort($queries);
-            $settings->set('dynamicitemsets_item_sets_queries_dynamic', $queries);
+            $settings->set($settingName, $queries);
         }
 
         return $queries;
@@ -596,7 +669,7 @@ class Module extends AbstractModule
         $element = $formManager->get(\Omeka\Form\Element\Query::class);
         $element
             ->setName('item_set_query_items')
-            ->setLabel('Query to attach items dynamically to this item set') // @translate
+            ->setLabel('Query to make this item set dynamic in order to include and to exclude items automatically') // @translate
             ->setOptions([
                 'query_resource_type' => 'items',
             ])
