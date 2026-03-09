@@ -38,8 +38,11 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
         'Common', '3.4.81'
     );
-    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    $messenger->addError($message);
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
 }
+
+$hasError = false;
 
 // Check for incompatibility.
 if ($this->isModuleActive('AdvancedResourceTemplate')
@@ -49,7 +52,12 @@ if ($this->isModuleActive('AdvancedResourceTemplate')
         $translator->translate('To avoid compatibility issue, the module {module} should be version {version} or greater.'), // @translate
         ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
     );
-    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    $messenger->addError($message);
+    $hasError = true;
+}
+
+if ($hasError) {
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
 }
 
 if (version_compare($oldVersion, '3.4.5', '<')) {

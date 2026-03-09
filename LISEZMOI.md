@@ -123,7 +123,7 @@ connaissance de la licence CeCILL et que vous en acceptez les termes.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2023-2025 (voir [Daniel-KM] sur GitLab)
+* Copyright Daniel Berthereau, 2023-2026 (voir [Daniel-KM] sur GitLab)
 
 Cette fonctionnalité était initialement présente dans le module [Modèle de ressources avancé]
 avant d’en être extraite pour en faire un module indépendant pour le site des

@@ -3,7 +3,9 @@
 namespace DynamicItemSets;
 
 if (!class_exists('Common\TraitModule', false)) {
-    require_once dirname(__DIR__) . '/Common/TraitModule.php';
+    require_once file_exists(dirname(__DIR__) . '/Common/src/TraitModule.php')
+        ? dirname(__DIR__) . '/Common/src/TraitModule.php'
+        : dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
 use Common\Stdlib\PsrMessage;
@@ -17,7 +19,7 @@ use Omeka\Module\AbstractModule;
 /**
  * Dynamic Item Sets.
  *
- * @copyright Daniel Berthereau, 2023-2025
+ * @copyright Daniel Berthereau, 2023-2026
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 class Module extends AbstractModule
@@ -46,6 +48,8 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
+        $errors = [];
+
         // If present, AdvancedResourceTemplate should be at least 3.4.36.
         if ($this->isModuleActive('AdvancedResourceTemplate')
             && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
@@ -54,7 +58,11 @@ class Module extends AbstractModule
                 $translator->translate('When present, the module requires module {module} version {version} or greater.'), // @translate
                 ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
             );
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+            $errors[] = (string) $message;
+        }
+
+        if ($errors) {
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n", $errors));
         }
     }
 

@@ -125,7 +125,7 @@ altered, and that no provisions are either added or removed herefrom.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2023-2025 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2023-2026 (see [Daniel-KM] on GitLab)
 
 This feature was initially present in the module [Advanced Resource Template],
 before being extracted as an independent module for the [collections de la Maison de Salins].
