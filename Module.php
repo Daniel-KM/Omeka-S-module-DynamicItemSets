@@ -85,9 +85,10 @@ class Module extends AbstractModule
         $settings->delete('advancedresourcetemplate_item_set_queries');
 
         // Set it by default in admin for module Advanced Search.
-        $selectedSearchFields = $settings->get('advancedsearch_search_fields');
-        if ($selectedSearchFields) {
-            $selectedSearchFields[] = 'common/advanced-search/item-set-is-dynamic';
+        $searchFields = $settings->get('advancedsearch_search_fields');
+        if ($searchFields !== null) {
+            $searchFields[] = 'common/advanced-search/item-set-is-dynamic';
+            $settings->set('advancedsearch_search_fields', $searchFields);
         }
 
         $this->postInstallAuto();
