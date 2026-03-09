@@ -4,6 +4,10 @@ namespace DynamicItemSets\Form\Element;
 
 use Omeka\Form\Element\ArrayTextarea;
 
+/**
+ * @deprecated Use Common.
+ * @see \Common\Form\Element\ArrayQueriesTextarea
+ */
 class ArrayTextareaQueries extends ArrayTextarea
 {
     /**

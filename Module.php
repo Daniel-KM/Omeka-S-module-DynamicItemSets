@@ -152,12 +152,12 @@ class Module extends AbstractModule
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
             'view.details',
-            [$this, 'handleItemSetDetails']
+            [$this, 'handleResourceDetails']
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
             'view.show.sidebar',
-            [$this, 'handleItemSetSidebar']
+            [$this, 'handleResourceSidebar']
         );
 
         // Display the item set query for items in advanced tab.
@@ -274,20 +274,20 @@ class Module extends AbstractModule
         $event->setParam('filters', $filters);
     }
 
-    public function handleItemSetDetails(Event $event): void
+    public function handleResourceDetails(Event $event): void
     {
-        $itemSet = $event->getParam('entity');
-        echo $this->showItemSetDynamic($event, $itemSet);
+        $resource = $event->getParam('entity');
+        echo $this->showResource($event, $resource);
     }
 
-    public function handleItemSetSidebar(Event $event): void
+    public function handleResourceSidebar(Event $event): void
     {
         $view = $event->getTarget();
-        $itemSet = $view->vars()->offsetGet('resource');
-        echo $this->showItemSetDynamic($event, $itemSet);
+        $resource = $view->vars()->offsetGet('resource');
+        echo $this->showResource($event, $resource);
     }
 
-    protected function showItemSetDynamic(Event $event, ItemSetRepresentation $itemSet): string
+    protected function showResource(Event $event, ItemSetRepresentation $itemSet): string
     {
         /**
          * @var \Omeka\Settings\Settings $settings
@@ -401,6 +401,7 @@ class Module extends AbstractModule
         if ($responseContent === 'representation') {
             $newItem = $adapter->getRepresentation($newItem);
         } elseif ($responseContent === 'reference') {
+            // FIXME Update in Omeka 4.2.
             $newItem = $adapter->getRepresentation($newItem)->getReference();
         }
 
@@ -569,10 +570,7 @@ class Module extends AbstractModule
         $message = new PsrMessage(
             'The query for the item set was changed: a job is run in background to detach and to attach items (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
             [
-                'link_job' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-                ),
+                'link_job' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
                 'link_log' => class_exists('Log\Module', false)
