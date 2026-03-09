@@ -422,6 +422,7 @@ class Module extends AbstractModule
         $matchingItemSetIds = [];
         foreach ($queries as $itemSetId => $query) {
             $query = $this->removeArgumentsPageAndSort($query);
+            $query = $this->normalizeQueryProperty($query);
             $query['id'] = [$itemId];
             $total = $api->search('items', $query + ['limit' => 0])->getTotalResults();
             if ($total) {
@@ -737,6 +738,36 @@ class Module extends AbstractModule
                 'direct' => empty($params['module_tasks']['dynis_reindex_settings']['via_api']),
             ]);
         }
+    }
+
+    /**
+     * Normalize property query rows for the core adapter.
+     *
+     * AdvancedSearch may store "property" as an array (multi-property select).
+     * The core adapter expects a scalar (string term or integer id). Flatten to
+     * the first value when needed.
+     * @todo This issue is fixed in AdvancedSearch, but it may not be up to date.
+     */
+    protected function normalizeQueryProperty(array $query): array
+    {
+        if (empty($query['property']) || !is_array($query['property'])) {
+            return $query;
+        }
+        foreach ($query['property'] as &$row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            if (isset($row['property']) && is_array($row['property'])) {
+                $row['property'] = reset($row['property']) ?: '';
+            }
+            if (isset($row['joiner'])
+                && !in_array($row['joiner'], ['and', 'or'])
+            ) {
+                $row['joiner'] = 'and';
+            }
+        }
+        unset($row);
+        return $query;
     }
 
     /**
