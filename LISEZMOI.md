@@ -24,6 +24,10 @@ Consulter la documentation utilisateur pour [installer un module].
 
 Ce module utilise le module [Common], qui doit être installé en premier.
 
+Avec de grosses bases ou chez un hébergeur partagé, il est recommandé
+d’installer le module [Job Queue] pour éviter les surcharges sur le serveur
+lorsque les données sont indexées.
+
 * À partir du zip
 
 Télécharger la dernière livraison [DynamicItemSets.zip] depuis la liste des
@@ -140,7 +144,7 @@ avant d’en être extraite pour en faire un module indépendant pour le site de
 [DynamicItemSets.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/releases
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf/-/releases
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
-[questions du module]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues
+[questions du module]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
