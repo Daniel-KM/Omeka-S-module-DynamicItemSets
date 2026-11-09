@@ -153,7 +153,7 @@ Improvements were made for the [Curiothèque] of the [Institut Curie].
 [DynamicItemSets.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/releases
 [Data Type Rdf]: https://gitlab.com/Daniel-KM/Omeka-S-module-DataTypeRdf/-/releases
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-DynamicItemSets/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

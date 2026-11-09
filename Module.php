@@ -67,9 +67,7 @@ class Module extends AbstractModule
         $errors = [];
 
         // If present, AdvancedResourceTemplate should be at least 3.4.36.
-        if ($this->isModuleActive('AdvancedResourceTemplate')
-            && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
-        ) {
+        if (!$this->checkModuleAvailability('AdvancedResourceTemplate', '3.4.38')) {
             $message = new PsrMessage(
                 $translator->translate('When present, the module requires module {module} version {version} or greater.'), // @translate
                 ['module' => 'Advanced Resource Template', 'version' => '3.4.38']

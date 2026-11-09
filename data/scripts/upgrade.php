@@ -22,7 +22,8 @@ use Common\Stdlib\PsrMessage;
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $plugins = $services->get('ControllerPluginManager');
-$url = $plugins->get('url');
+$helpers = $services->get('ViewHelperManager');
+$url = $helpers->get('url');
 $api = $plugins->get('api');
 $logger = $services->get('Omeka\Logger');
 $settings = $services->get('Omeka\Settings');
@@ -45,9 +46,7 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
 $hasError = false;
 
 // Check for incompatibility.
-if ($this->isModuleActive('AdvancedResourceTemplate')
-    && !$this->checkModuleActiveVersion('AdvancedResourceTemplate', '3.4.38')
-) {
+if (!$this->checkModuleAvailability('AdvancedResourceTemplate', '3.4.38')) {
     $message = new PsrMessage(
         $translator->translate('To avoid compatibility issue, the module {module} should be version {version} or greater.'), // @translate
         ['module' => 'Advanced Resource Template', 'version' => '3.4.38']
@@ -88,4 +87,15 @@ if (version_compare($oldVersion, '3.4.5', '<')) {
         'A new setting allows to set static item sets filled dynamically. When an item is saved, it will be included in item sets matching queries. Unlike dynamic item sets, an item won’t be removed from an item set automatically when the metadata does not match a query any more.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.8', '<')) {
+    if (!$this->isModuleActive('JobQueue')) {
+        $message = new PsrMessage(
+            'The optional module {link}Job Queue{link_end} can be installed to avoid running the same background jobs several times in parallel and to limit the number of heavy jobs running at the same time.', // @translate
+            ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-JobQueue" target="_blank" rel="noopener">', 'link_end' => '</a>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addNotice($message);
+    }
 }
