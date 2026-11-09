@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 00:00+0000\n"
+"POT-Creation-Date: 2026-11-09 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -17,16 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:38 Module.php:61
+#: data/scripts/upgrade.php:39 Module.php:61
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: data/scripts/upgrade.php:42 data/scripts/upgrade.php:60
+#: data/scripts/upgrade.php:43 data/scripts/upgrade.php:59
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: data/scripts/upgrade.php:52
+#: data/scripts/upgrade.php:51
 msgid ""
 "To avoid compatibility issue, the module {module} should be version "
 "{version} or greater."
@@ -34,7 +34,7 @@ msgstr ""
 "Pour éviter des problèmes de compatibilités, le module {module} doit mis à "
 "niveau à la version {version} ou supérieure."
 
-#: Module.php:74
+#: Module.php:72
 msgid ""
 "When present, the module requires module {module} version {version} or "
 "greater."
@@ -42,7 +42,7 @@ msgstr ""
 "Lorsqu’il est présent, le module nécessite que le module {module} soit mis à "
 "niveau à la version {version} ou supérieure."
 
-#: Module.php:286 Module.php:325
+#: Module.php:284 Module.php:323
 msgid "Is dynamic"
 msgstr "Est dynamique"
 
@@ -50,7 +50,7 @@ msgstr "Est dynamique"
 msgid "Search dynamic item sets"
 msgstr "Rechercher les collections dynamiques"
 
-#: data/scripts/upgrade.php:83
+#: data/scripts/upgrade.php:82
 msgid ""
 "The attached items to an item set are no more detached when the query is "
 "removed."
@@ -58,7 +58,7 @@ msgstr ""
 "Les contenus attachés à une collection ne sont plus détachés quand la "
 "requête est supprimée."
 
-#: data/scripts/upgrade.php:88
+#: data/scripts/upgrade.php:87
 msgid ""
 "A new setting allows to set static item sets filled dynamically. When an "
 "item is saved, it will be included in item sets matching queries. Unlike "
@@ -71,13 +71,23 @@ msgstr ""
 "dynamiques, un contenu ne sera pas retiré d’une collection automatiquement "
 "quand ses métadonnées ne correspondent plus à la requête."
 
-#: Module.php:565
+#: data/scripts/upgrade.php:95
+msgid ""
+"The optional module {link}Job Queue{link_end} can be installed to avoid "
+"running the same background jobs several times in parallel and to limit the "
+"number of heavy jobs running at the same time."
+msgstr ""
+"Le module optionnel {link}Job Queue{link_end} peut être installé pour éviter "
+"que les mêmes tâches en arrière-plan ne s'exécutent en parallèle et pour "
+"limiter les grosses tâches simultanées."
+
+#: Module.php:563
 msgid "The query to attach items cannot contain the item set itself."
 msgstr ""
 "La requête pour attacher les contenus ne peut pas contenir la collection "
 "elle-même."
 
-#: Module.php:595
+#: Module.php:593
 msgid ""
 "The query for the item set was changed: a job is run in background to detach "
 "and to attach items (job {link_job}#{job_id}{link_end}, {link_log}"
@@ -87,7 +97,7 @@ msgstr ""
 "plan pour détacher et attacher les contenus ({link_job}tâche #{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: Module.php:703
+#: Module.php:701
 msgid ""
 "Query to make this item set dynamic in order to include and to exclude items "
 "automatically"
@@ -95,33 +105,31 @@ msgstr ""
 "Requête pour rendre la collection dynamique afin d’inclure ou exclure les "
 "contenus automatiquement"
 
-#: Module.php:725
+#: Module.php:723
 msgid "Dynamic item sets: Reindex item sets"
 msgstr "Collections dynamiques : Ré-indexer les collections"
 
-#: Module.php:731
-#, fuzzy
-#| msgid "Dynamic item sets: Reindex item sets"
+#: Module.php:729
 msgid "Dynamic item sets: Reindex"
-msgstr "Collections dynamiques : Ré-indexer les collections"
+msgstr "Collections dynamiques : Ré-indexer"
 
-#: Module.php:732
+#: Module.php:730
 msgid "Reindex the items contained in dynamic item sets."
 msgstr "Ré-indexer les contenus des collections dynamiques"
 
-#: Module.php:734
+#: Module.php:732
 msgid "Reindex"
 msgstr "Ré-indexer"
 
-#: Module.php:745
+#: Module.php:743
 msgid "Options to reindex dynamic item sets"
 msgstr "Options pour ré-indexer les collections dynamiques"
 
-#: Module.php:756
+#: Module.php:754
 msgid "Run events"
 msgstr "Déclencher les événements"
 
-#: Module.php:757
+#: Module.php:755
 msgid ""
 "This option is used to reindex external search engine at the same time, but "
 "it is generally simpler to reindex it separately."
